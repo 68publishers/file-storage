@@ -1,0 +1,68 @@
+{
+	"name": "68publishers/file-storage",
+	"description": "File management based on Flysystem with an integration into Nette Framework.",
+	"keywords": ["68publishers", "file", "storage", "nette", "files"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Tomáš Glawaty",
+			"email": "tomasglawaty@icloud.com"
+		}
+	],
+	"require": {
+		"php": "^7.3",
+		"ext-json": "*",
+		"league/flysystem": "^2.0",
+		"psr/log": "^1.1"
+	},
+	"require-dev": {
+		"68publishers/doctrine-bridge": "^0.1.1",
+		"doctrine/orm": "^2.8",
+		"friendsofphp/php-cs-fixer": "^2.0",
+		"latte/latte": "^2.7",
+		"nette/di": "^3.0.3",
+		"nette/tester": "^2.3.4",
+		"roave/security-advisories": "dev-master",
+		"symfony/console": "^4.0 | ^5.0"
+	},
+	"suggest": {
+		"nette/di": "For an integration with Nette Framework.",
+		"68publishers/doctrine-bridge": "For an integration of a custom Doctrine types into the Nette.",
+		"latte/latte": "For usage with Latte templates.",
+		"symfony/console": "If you want to use a console commands."
+	},
+	"conflict": {
+		"nette/di": "<3.0",
+		"nette/schema": "<1.1",
+		"latte/latte": "<2.7",
+		"68publishers/doctrine-bridge": "<0.1.1",
+		"symfony/console": "<4.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"SixtyEightPublishers\\FileStorage\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"SixtyEightPublishers\\FileStorage\\Tests\\": "tests/"
+		}
+	},
+	"config": {
+		"sort-packages": true
+	},
+	"scripts": {
+		"tests": [
+			"@tests:lowest",
+			"@tests:highest"
+		],
+		"tests:lowest" : [
+			"@composer update --no-progress --prefer-dist --prefer-lowest --prefer-stable",
+			"vendor/bin/tester ./tests"
+		],
+		"tests:highest" : [
+			"@composer update --no-progress --prefer-dist --prefer-stable",
+			"vendor/bin/tester ./tests"
+		]
+	}
+}
