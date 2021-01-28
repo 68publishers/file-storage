@@ -25,7 +25,7 @@ extensions:
     storages:
         default:
             config:
-                base_path: /data/files				
+                base_path: /data/files
             filesystem:
                 adapter: League\Flysystem\Local\LocalFilesystemAdapter(%wwwDir%/data/files)
                 config: # an optional config for filesystem adapter
@@ -34,7 +34,7 @@ extensions:
                 path/to/directory: my-directory # copy whole directory
         s3:
             config:
-                host: https://my-buket.s3.amazonaws.com				
+                host: https://my-buket.s3.amazonaws.com
             filesystem:
                 adapter: League\Flysystem\AwsS3V3\AwsS3V3Adapter(@s3client, my-bucket)
 ```

@@ -43,7 +43,7 @@ class Resource implements ResourceInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function withPathInfo(PathInfoInterface $pathInfo) : self
+	public function withPathInfo(PathInfoInterface $pathInfo): self
 	{
 		return new static($pathInfo, $this->getSource());
 	}
