@@ -25,7 +25,7 @@ final class Path
 		$name = explode('.', array_pop($namespace));
 		$startsWithDot = FALSE;
 
-		if ('' === $name[0] ?? NULL) {
+		if (1 < count($name) && '' === $name[0] ?? NULL) {
 			unset($name[0]);
 			$startsWithDot = TRUE;
 		}
