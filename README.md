@@ -1,13 +1,21 @@
-# File Storage
+<h1 align="center">File Storage</h1>
 
-:file_folder: File management based on [Flysystem](https://github.com/thephpleague/flysystem) with an integration into [Nette Framework](https://nette.org).
+<p align="center">:file_folder: File management based on <a href="https://github.com/thephpleague/flysystem">Flysystem</a> with an integration into <a href="https://nette.org">Nette Framework</a>.</p>
+
+<p align="center">
+<a href="https://github.com/68publishers/file-storage/actions"><img alt="Checks" src="https://badgen.net/github/checks/68publishers/file-storage/master"></a>
+<a href="https://coveralls.io/github/68publishers/file-storage?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/68publishers/file-storage/badge.svg?branch=master"></a>
+<a href="https://packagist.org/packages/68publishers/file-storage"><img alt="Total Downloads" src="https://badgen.net/packagist/dt/68publishers/file-storage"></a>
+<a href="https://packagist.org/packages/68publishers/file-storage"><img alt="Latest Version" src="https://badgen.net/packagist/v/68publishers/file-storage"></a>
+<a href="https://packagist.org/packages/68publishers/file-storage"><img alt="PHP Version" src="https://badgen.net/packagist/php/68publishers/file-storage"></a>
+</p>
 
 ## Installation
 
 The best way to install 68publishers/file-storage is using Composer:
 
-```bash
-composer require 68publishers/file-storage
+```sh
+$ composer require 68publishers/file-storage
 ```
 
 ## Integration into Nette Framework
@@ -41,11 +49,11 @@ extensions:
 
 #### Storage config options
 
-name | type | default | description
----- | ---- | ---- | ----
-base_path | string | `''` | Base path to a directory where the files are accessible.
-host | null or string | `null` | Hostname, use if the files are not stored locally or if you want to generate an absolute links
-version_parameter_name | `_v` | default | Name of a version parameter in URL.
+| name                   | type           | default | description                                                                                     |
+|------------------------|----------------|---------|-------------------------------------------------------------------------------------------------|
+| base_path              | string         | `''`    | Base path to a directory where the files are accessible.                                        |
+| host                   | null or string | `null`  | Hostname, use if the files are not stored locally or if you want to generate an absolute links. |
+| version_parameter_name | `_v`           | default | Name of a version parameter in URL.                                                             |
 
 ### Basic usage
 
@@ -295,10 +303,6 @@ echo (string) $entity->getSource();
 ```neon
 extensions:
     68publishers.file_storage.latte: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageLatteExtension
-
-68publishers.file_storage.latte:
-    function_names:
-        create_file_info: file_info # default
 ```
 
 ```latte
@@ -321,24 +325,24 @@ extensions:
 
 Clean storage command:
 
-```bash
+```sh
 $ bin/console file-storage:clean [<storage>] [--namespace <value>]
 ```
 
 Copy storage assets:
 
-```bash
+```sh
 $ bin/console file-storage:copy-assets [<storage>]
 ```
 
 ## Contributing
 
-Before committing any changes, don't forget to run
+Before opening a pull request, please check your changes using the following commands
 
-```bash
-$ vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run
-```
+```sh
+$ make init # to pull and start all docker images
 
-```bash
-$ composer run tests
+$ make cs.check
+$ make stan
+$ make tests.all
 ```
