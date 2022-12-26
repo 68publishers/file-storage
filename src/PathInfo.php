@@ -5,30 +5,22 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage;
 
 use SixtyEightPublishers\FileStorage\Exception\PathInfoException;
+use function sprintf;
 
 class PathInfo implements PathInfoInterface
 {
-	/** @var string  */
-	private $namespace;
+	private string $namespace;
 
-	/** @var string  */
-	private $name;
+	private string $name;
 
-	/** @var string|NULL */
-	private $extension;
+	private ?string $extension = null;
 
-	/** @var string|NULL */
-	private $version;
+	private ?string $version = null;
 
 	/**
-	 * @param string      $namespace
-	 * @param string      $name
-	 * @param string|NULL $extension
-	 * @param string|NULL $version
-	 *
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
 	 */
-	public function __construct(string $namespace, string $name, ?string $extension, ?string $version = NULL)
+	public function __construct(string $namespace, string $name, ?string $extension, ?string $version = null)
 	{
 		$this->setNamespace($namespace);
 		$this->setName($name);
@@ -36,10 +28,7 @@ class PathInfo implements PathInfoInterface
 		$this->setVersion($version);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function setNamespace(string $namespace): PathInfoInterface
+	public function setNamespace(string $namespace): static
 	{
 		$this->namespace = $namespace;
 
@@ -47,11 +36,9 @@ class PathInfo implements PathInfoInterface
 	}
 
 	/**
-	 * {@inheritDoc}
-	 *
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
 	 */
-	public function setName(string $name): PathInfoInterface
+	public function setName(string $name): static
 	{
 		if ($name === '') {
 			throw PathInfoException::invalidPath($name);
@@ -62,83 +49,57 @@ class PathInfo implements PathInfoInterface
 		return $this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function setExtension(?string $extension): PathInfoInterface
+	public function setExtension(?string $extension): static
 	{
 		$this->extension = $extension;
 
 		return $this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
-	 */
-	public function withExt(string $extension)
+	public function withExt(string $extension): static
 	{
-		return new static($this->getNamespace(), $this->getName(), $extension, $this->getVersion());
+		$info = clone $this;
+		$info->setExtension($extension);
+
+		return $info;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function setVersion(?string $version): PathInfoInterface
+	public function setVersion(?string $version): static
 	{
 		$this->version = $version;
 
 		return $this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getNamespace(): string
 	{
 		return $this->namespace;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getName(): string
 	{
 		return $this->name;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getExtension(): ?string
 	{
 		return $this->extension;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getVersion(): ?string
 	{
 		return $this->version;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getPath(): string
 	{
 		$namespace = $this->getNamespace();
 
 		return $namespace === ''
 			? $this->getName()
-			: sprintf('%s/%s%s', $namespace, $this->getName(), NULL === $this->getExtension() ? '' : '.' . $this->getExtension());
+			: sprintf('%s/%s%s', $namespace, $this->getName(), null === $this->getExtension() ? '' : '.' . $this->getExtension());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function __toString(): string
 	{
 		return $this->getPath();

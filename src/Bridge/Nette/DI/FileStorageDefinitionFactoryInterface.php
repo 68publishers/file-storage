@@ -5,22 +5,11 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI;
 
 use Nette\DI\Definitions\Definition;
+use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\StorageConfig;
 
 interface FileStorageDefinitionFactoryInterface
 {
-	/**
-	 * @param string $name
-	 * @param object $config
-	 *
-	 * @return bool
-	 */
-	public function canCreateFileStorage(string $name, object $config): bool;
+	public function canCreateFileStorage(string $name, StorageConfig $config): bool;
 
-	/**
-	 * @param string $name
-	 * @param object $config
-	 *
-	 * @return \Nette\DI\Definitions\Definition
-	 */
-	public function createFileStorage(string $name, object $config): Definition;
+	public function createFileStorage(string $name, StorageConfig $config): Definition;
 }

@@ -9,11 +9,7 @@ use League\Flysystem\FilesystemOperator;
 interface AssetFactoryInterface
 {
 	/**
-	 * @param \League\Flysystem\FilesystemOperator $localFilesystem
-	 * @param string                               $from
-	 * @param string                               $to
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\Asset\AssetInterface[]
+	 * @return array<AssetInterface>
 	 */
 	public function create(FilesystemOperator $localFilesystem, string $from, string $to): array;
 }

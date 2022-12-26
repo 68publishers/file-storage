@@ -7,46 +7,50 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\DI\CompilerExtension;
-use SixtyEightPublishers\DoctrineBridge\DI\DatabaseType;
 use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
-use SixtyEightPublishers\DoctrineBridge\DI\DatabaseTypeProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DatabaseType;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DoctrineBridgeExtension;
 use SixtyEightPublishers\FileStorage\Bridge\Nette\DbalType\FileInfo\FileInfoType;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DatabaseTypeProviderInterface;
+use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\FileStorageDoctrineConfig;
+use function count;
+use function assert;
 
 final class FileStorageDoctrineExtension extends CompilerExtension implements DatabaseTypeProviderInterface
 {
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
 			'type_name' => Expect::string('file_info'),
-		]);
+		])->castTo(FileStorageDoctrineConfig::class);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\RuntimeException
-	 */
 	public function loadConfiguration(): void
 	{
 		if (0 >= count($this->compiler->getExtensions(FileStorageExtension::class))) {
 			throw new RuntimeException(sprintf(
 				'The extension %s can be used only with %s.',
-				static::class,
+				self::class,
 				FileStorageExtension::class
+			));
+		}
+
+		if (0 >= count($this->compiler->getExtensions(DoctrineBridgeExtension::class))) {
+			throw new RuntimeException(sprintf(
+				'The extension %s can be used only with %s.',
+				self::class,
+				DoctrineBridgeExtension::class
 			));
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getDatabaseTypes(): array
 	{
+		$config = $this->getConfig();
+		assert($config instanceof FileStorageDoctrineConfig);
+
 		return [
-			new DatabaseType($this->config->type_name, FileInfoType::class),
+			new DatabaseType($config->type_name, FileInfoType::class),
 		];
 	}
 }

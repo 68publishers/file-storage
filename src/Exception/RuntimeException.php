@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\FileStorage\Exception;
 
-final class RuntimeException extends \RuntimeException implements ExceptionInterface
+use RuntimeException as OriginalRuntimeException;
+
+final class RuntimeException extends OriginalRuntimeException implements ExceptionInterface
 {
 }

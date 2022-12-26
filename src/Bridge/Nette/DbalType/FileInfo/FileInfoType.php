@@ -11,9 +11,6 @@ use SixtyEightPublishers\FileStorage\Bridge\Doctrine\DbalType\FileInfo\FileInfoT
 
 final class FileInfoType extends DoctrineFileInfoType implements ContainerAwareTypeInterface
 {
-	/**
-	 * {@inheritDoc}
-	 */
 	public function setContainer(Container $container, array $context = []): void
 	{
 		$this->setFileStorageProvider(

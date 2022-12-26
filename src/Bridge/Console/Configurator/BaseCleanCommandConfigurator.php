@@ -11,17 +11,11 @@ use SixtyEightPublishers\FileStorage\Cleaner\StorageCleanerInterface;
 
 final class BaseCleanCommandConfigurator implements CleanCommandConfiguratorInterface
 {
-	/**
-	 * {@inheritDoc}
-	 */
 	public function setupOptions(Command $command): void
 	{
-		$command->addOption(StorageCleanerInterface::OPTION_NAMESPACE, NULL, InputOption::VALUE_OPTIONAL, 'Search only in a specific namespace', NULL);
+		$command->addOption(StorageCleanerInterface::OPTION_NAMESPACE, null, InputOption::VALUE_OPTIONAL, 'Search only in a specific namespace', null);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getCleanerOptions(InputInterface $input): array
 	{
 		if ($input->hasOption(StorageCleanerInterface::OPTION_NAMESPACE)) {

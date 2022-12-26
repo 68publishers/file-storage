@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\FileStorage\Asset;
 
+use League\Flysystem\FilesystemReader;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\FilesystemOperator;
 use SixtyEightPublishers\FileStorage\Exception\InvalidArgumentException;
+use function trim;
+use function rtrim;
+use function strlen;
+use function substr;
+use function sprintf;
+use function strncmp;
+use function str_replace;
 
 final class AssetFactory implements AssetFactoryInterface
 {
 	/**
-	 * {@inheritDoc}
-	 *
 	 * @throws \League\Flysystem\FilesystemException
 	 */
 	public function create(FilesystemOperator $localFilesystem, string $from, string $to): array
@@ -27,7 +33,7 @@ final class AssetFactory implements AssetFactoryInterface
 
 		$normalizedDirectory = str_replace('\\', '/', rtrim($from, '\\/')) . '/';
 
-		return $localFilesystem->listContents($normalizedDirectory, FilesystemOperator::LIST_DEEP)
+		return $localFilesystem->listContents($normalizedDirectory, FilesystemReader::LIST_DEEP)
 			->filter(static function (StorageAttributes $attributes) {
 				return $attributes->isFile();
 			})

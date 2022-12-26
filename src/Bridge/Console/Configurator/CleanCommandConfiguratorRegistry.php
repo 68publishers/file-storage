@@ -6,25 +6,21 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Console\Configurator;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use function array_merge;
 
 final class CleanCommandConfiguratorRegistry implements CleanCommandConfiguratorInterface
 {
-	/** @var \SixtyEightPublishers\FileStorage\Bridge\Console\Configurator\CleanCommandConfiguratorInterface[] */
-	private $configurators;
+	/** @var array<CleanCommandConfiguratorInterface> */
+	private array $configurators;
 
 	/**
-	 * @param \SixtyEightPublishers\FileStorage\Bridge\Console\Configurator\CleanCommandConfiguratorInterface[] $configurators
+	 * @param array<CleanCommandConfiguratorInterface> $configurators
 	 */
 	public function __construct(array $configurators)
 	{
-		$this->configurators = (static function (CleanCommandConfiguratorInterface ...$configurators) {
-			return $configurators;
-		})(...$configurators);
+		$this->configurators = (static fn (CleanCommandConfiguratorInterface ...$configurators) => $configurators)(...$configurators);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function setupOptions(Command $command): void
 	{
 		foreach ($this->configurators as $configurator) {
@@ -32,9 +28,6 @@ final class CleanCommandConfiguratorRegistry implements CleanCommandConfigurator
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getCleanerOptions(InputInterface $input): array
 	{
 		$options = [];

@@ -5,28 +5,30 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI;
 
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\ServiceDefinition;
 use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
 use SixtyEightPublishers\FileStorage\Bridge\Console\Command\CleanCommand;
 use SixtyEightPublishers\FileStorage\Bridge\Console\Command\CopyAssetsCommand;
 use SixtyEightPublishers\FileStorage\Bridge\Console\Configurator\BaseCleanCommandConfigurator;
 use SixtyEightPublishers\FileStorage\Bridge\Console\Configurator\CleanCommandConfiguratorRegistry;
 use SixtyEightPublishers\FileStorage\Bridge\Console\Configurator\CleanCommandConfiguratorInterface;
+use function count;
+use function assert;
+use function sprintf;
+use function array_map;
+use function array_keys;
 
 final class FileStorageConsoleExtension extends CompilerExtension
 {
 	public const TAG_CLEAN_COMMAND_CONFIGURATOR = '68publishers.file_storage.console.clean_command_configurator';
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\RuntimeException
-	 */
 	public function loadConfiguration(): void
 	{
 		if (0 >= count($this->compiler->getExtensions(FileStorageExtension::class))) {
 			throw new RuntimeException(sprintf(
 				'The extension %s can be used only with %s.',
-				static::class,
+				self::class,
 				FileStorageExtension::class
 			));
 		}
@@ -42,7 +44,7 @@ final class FileStorageConsoleExtension extends CompilerExtension
 			->setType(CleanCommandConfiguratorInterface::class)
 			->setFactory(BaseCleanCommandConfigurator::class)
 			->addTag(self::TAG_CLEAN_COMMAND_CONFIGURATOR)
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('command.clean'))
 			->setType(CleanCommand::class);
@@ -52,20 +54,15 @@ final class FileStorageConsoleExtension extends CompilerExtension
 			->setType(CopyAssetsCommand::class);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
 
-		/** @var \Nette\DI\Definitions\ServiceDefinition $cleanCommandConfiguratorRegistry */
 		$cleanCommandConfiguratorRegistry = $builder->getDefinition($this->prefix('configurator.clean_command.registry'));
+		assert($cleanCommandConfiguratorRegistry instanceof ServiceDefinition);
 
 		$cleanCommandConfiguratorRegistry->setArguments([
-			array_map(static function (string $name) {
-				return '@' . $name;
-			}, array_keys($builder->findByTag(self::TAG_CLEAN_COMMAND_CONFIGURATOR))),
+			array_map(static fn (string $name): Reference => new Reference($name), array_keys($builder->findByTag(self::TAG_CLEAN_COMMAND_CONFIGURATOR))),
 		]);
 	}
 }

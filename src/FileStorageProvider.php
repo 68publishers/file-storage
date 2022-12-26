@@ -6,23 +6,20 @@ namespace SixtyEightPublishers\FileStorage;
 
 use ArrayIterator;
 use SixtyEightPublishers\FileStorage\Exception\InvalidArgumentException;
+use function sprintf;
 
 final class FileStorageProvider implements FileStorageProviderInterface
 {
-	/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface  */
-	private $defaultFileStorage;
-
-	/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface[]  */
-	private $fileStorageInstances = [];
+	/** @var array<string, FileStorageInterface> */
+	private array $fileStorageInstances = [];
 
 	/**
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageInterface   $defaultFileStorage
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageInterface[] $fileStorageInstances
+	 * @param array<FileStorageInterface> $fileStorageInstances
 	 */
-	public function __construct(FileStorageInterface $defaultFileStorage, array $fileStorageInstances)
-	{
-		$this->defaultFileStorage = $defaultFileStorage;
-
+	public function __construct(
+		private readonly FileStorageInterface $defaultFileStorage,
+		array $fileStorageInstances,
+	) {
 		$this->addFileStorage($defaultFileStorage);
 
 		foreach ($fileStorageInstances as $fileStorageInstance) {
@@ -30,12 +27,9 @@ final class FileStorageProvider implements FileStorageProviderInterface
 		}
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function get(?string $name = NULL): FileStorageInterface
+	public function get(?string $name = null): FileStorageInterface
 	{
-		if (NULL === $name) {
+		if (null === $name) {
 			return $this->defaultFileStorage;
 		}
 
@@ -50,18 +44,13 @@ final class FileStorageProvider implements FileStorageProviderInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * @return ArrayIterator<string, FileStorageInterface>
 	 */
 	public function getIterator(): ArrayIterator
 	{
 		return new ArrayIterator($this->fileStorageInstances);
 	}
 
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageInterface $fileStorage
-	 *
-	 * @return void
-	 */
 	private function addFileStorage(FileStorageInterface $fileStorage): void
 	{
 		$this->fileStorageInstances[$fileStorage->getName()] = $fileStorage;

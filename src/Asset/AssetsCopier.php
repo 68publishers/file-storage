@@ -8,37 +8,22 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 use League\Flysystem\FilesystemOperator;
 use SixtyEightPublishers\FileStorage\FileStorageInterface;
+use function sprintf;
 
 final class AssetsCopier implements AssetsCopierInterface
 {
-	/** @var \League\Flysystem\FilesystemOperator  */
-	private $localFilesystemOperator;
-
-	/** @var \SixtyEightPublishers\FileStorage\Asset\PathsProviderInterface  */
-	private $pathsProvider;
-
-	/** @var \SixtyEightPublishers\FileStorage\Asset\AssetFactoryInterface  */
-	private $assetFactory;
-
-	/**
-	 * @param \League\Flysystem\FilesystemOperator                           $localFilesystemOperator
-	 * @param \SixtyEightPublishers\FileStorage\Asset\PathsProviderInterface $pathsProvider
-	 * @param \SixtyEightPublishers\FileStorage\Asset\AssetFactoryInterface  $assetFactory
-	 */
-	public function __construct(FilesystemOperator $localFilesystemOperator, PathsProviderInterface $pathsProvider, AssetFactoryInterface $assetFactory)
-	{
-		$this->localFilesystemOperator = $localFilesystemOperator;
-		$this->pathsProvider = $pathsProvider;
-		$this->assetFactory = $assetFactory;
+	public function __construct(
+		private readonly FilesystemOperator $localFilesystemOperator,
+		private readonly PathsProviderInterface $pathsProvider,
+		private readonly AssetFactoryInterface $assetFactory
+	) {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 *
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FileNotFoundException
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
 	 */
-	public function copy(FileStorageInterface $fileStorage, ?LoggerInterface $logger = NULL): void
+	public function copy(FileStorageInterface $fileStorage, ?LoggerInterface $logger = null): void
 	{
 		$logger = $logger ?? new NullLogger();
 
@@ -57,9 +42,6 @@ final class AssetsCopier implements AssetsCopierInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\FileStorage\Asset\AssetInterface $asset
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageInterface $fileStorage
-	 *
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FileNotFoundException
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
 	 */
