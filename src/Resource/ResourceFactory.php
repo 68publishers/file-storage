@@ -9,30 +9,28 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
 use League\Flysystem\FilesystemException as LeagueFilesystemException;
+use function sprintf;
+use function file_exists;
+use function error_get_last;
+use function error_clear_last;
 
 final class ResourceFactory implements ResourceFactoryInterface
 {
-	/** @var \League\Flysystem\FilesystemReader  */
-	private $filesystemReader;
-
-	/**
-	 * @param \League\Flysystem\FilesystemReader $filesystemReader
-	 */
-	public function __construct(FilesystemReader $filesystemReader)
-	{
-		$this->filesystemReader = $filesystemReader;
+	public function __construct(
+		private readonly FilesystemReader $filesystemReader
+	) {
 	}
 
 	/**
-	 * {@inheritdoc}
-	 *
+	 * @throws \SixtyEightPublishers\FileStorage\Exception\FileNotFoundException
 	 * @throws \League\Flysystem\FilesystemException
+	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
 	 */
 	public function createResource(PathInfoInterface $pathInfo): ResourceInterface
 	{
 		$path = $pathInfo->getPath();
 
-		if (FALSE === $this->filesystemReader->fileExists($path)) {
+		if (false === $this->filesystemReader->fileExists($path)) {
 			throw new FileNotFoundException($path);
 		}
 
@@ -45,19 +43,9 @@ final class ResourceFactory implements ResourceFactoryInterface
 			), 0, $e);
 		}
 
-		if (FALSE === $source) {
-			throw new FilesystemException(sprintf(
-				'Can not read stream from file %s',
-				$path
-			), 0);
-		}
-
-		return new Resource($pathInfo, $source);
+		return new SimpleResource($pathInfo, $source);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
 	{
 		error_clear_last();
@@ -68,7 +56,7 @@ final class ResourceFactory implements ResourceFactoryInterface
 
 		$resource = @fopen($filename, 'rb');
 
-		if (FALSE === $resource) {
+		if (false === $resource) {
 			throw new FilesystemException(sprintf(
 				'Can not read stream from file %s. %s',
 				$filename,
@@ -76,6 +64,6 @@ final class ResourceFactory implements ResourceFactoryInterface
 			), 0);
 		}
 
-		return new Resource($pathInfo, $resource);
+		return new SimpleResource($pathInfo, $resource);
 	}
 }

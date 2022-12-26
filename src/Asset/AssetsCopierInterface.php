@@ -9,11 +9,5 @@ use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
 interface AssetsCopierInterface
 {
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageInterface $fileStorage
-	 * @param \Psr\Log\LoggerInterface|NULL                          $logger
-	 *
-	 * @return void
-	 */
-	public function copy(FileStorageInterface $fileStorage, ?LoggerInterface $logger = NULL): void;
+	public function copy(FileStorageInterface $fileStorage, ?LoggerInterface $logger = null): void;
 }

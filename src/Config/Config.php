@@ -6,18 +6,23 @@ namespace SixtyEightPublishers\FileStorage\Config;
 
 use SixtyEightPublishers\FileStorage\Exception\InvalidArgumentException;
 use SixtyEightPublishers\FileStorage\Exception\IllegalMethodCallException;
+use function trim;
+use function rtrim;
+use function sprintf;
+use function array_merge;
+use function array_key_exists;
 
 class Config implements ConfigInterface
 {
-	/** @var array  */
-	protected $config = [
+	/** @var array<string, mixed> */
+	protected array $config = [
 		self::BASE_PATH => '',
-		self::HOST => NULL,
+		self::HOST => null,
 		self::VERSION_PARAMETER_NAME => '_v',
 	];
 
 	/**
-	 * @param array $config
+	 * @param array<string, mixed> $config
 	 */
 	public function __construct(array $config)
 	{
@@ -31,47 +36,35 @@ class Config implements ConfigInterface
 		}
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function offsetExists($offset): bool
 	{
 		return array_key_exists($offset, $this->config);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function offsetGet($offset)
+	public function offsetGet($offset): mixed
 	{
 		if (!$this->offsetExists($offset)) {
 			throw new InvalidArgumentException(sprintf(
 				'Missing a configuration option %s',
-				(string) $offset
+				$offset
 			));
 		}
 
 		return $this->config[$offset];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function offsetSet($offset, $value): void
+	public function offsetSet($offset, $value): never
+	{
+		throw IllegalMethodCallException::notAllowed(__METHOD__);
+	}
+
+	public function offsetUnset($offset): never
 	{
 		throw IllegalMethodCallException::notAllowed(__METHOD__);
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
-	public function offsetUnset($offset): void
-	{
-		throw IllegalMethodCallException::notAllowed(__METHOD__);
-	}
-
-	/**
-	 * {@inheritdoc}
+	 * @return array<string, mixed>
 	 */
 	public function jsonSerialize(): array
 	{

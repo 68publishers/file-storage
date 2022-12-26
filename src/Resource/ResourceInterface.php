@@ -8,20 +8,12 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 
 interface ResourceInterface
 {
-	/**
-	 * @return \SixtyEightPublishers\FileStorage\PathInfoInterface
-	 */
 	public function getPathInfo(): PathInfoInterface;
 
 	/**
-	 * @return mixed
+	 * @return mixed|resource
 	 */
-	public function getSource();
+	public function getSource(): mixed;
 
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\PathInfoInterface $pathInfo
-	 *
-	 * @return $this
-	 */
-	public function withPathInfo(PathInfoInterface $pathInfo);
+	public function withPathInfo(PathInfoInterface $pathInfo): static;
 }

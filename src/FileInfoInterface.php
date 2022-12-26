@@ -8,18 +8,12 @@ use JsonSerializable;
 
 interface FileInfoInterface extends PathInfoInterface, JsonSerializable
 {
-	/**
-	 * @return string
-	 */
 	public function getStorageName(): string;
 
-	/**
-	 * @return string
-	 */
 	public function link(): string;
 
 	/**
-	 * @return array
+	 * @return array{path: string, storage: string, version: ?string}
 	 */
 	public function jsonSerialize(): array;
 }

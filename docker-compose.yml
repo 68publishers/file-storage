@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+    php81:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: php81
+        container_name: 68publishers.file-storage.81
+        volumes:
+            - .:/var/www/html:cached

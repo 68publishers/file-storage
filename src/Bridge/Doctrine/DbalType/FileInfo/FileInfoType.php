@@ -15,28 +15,17 @@ class FileInfoType extends JsonType
 {
 	public const NAME = 'file_info';
 
-	/** @var \SixtyEightPublishers\FileStorage\FileStorageProviderInterface|NULL */
-	private $fileStorageProvider;
+	private ?FileStorageProviderInterface $fileStorageProvider = null;
 
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\FileStorageProviderInterface $fileStorageProvider
-	 *
-	 * @return void
-	 */
 	public function setFileStorageProvider(FileStorageProviderInterface $fileStorageProvider): void
 	{
 		$this->fileStorageProvider = $fileStorageProvider;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @throws \Doctrine\DBAL\Types\ConversionException
-	 */
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
-		if (NULL === $value) {
-			return NULL;
+		if (null === $value) {
+			return null;
 		}
 
 		if (!$value instanceof FileInfoInterface) {
@@ -52,20 +41,15 @@ class FileInfoType extends JsonType
 		return parent::convertToDatabaseValue($value, $platform);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @throws \Doctrine\DBAL\Types\ConversionException
-	 */
 	public function convertToPHPValue($value, AbstractPlatform $platform): ?FileInfoInterface
 	{
 		$value = parent::convertToPHPValue($value, $platform);
 
-		if (NULL === $value) {
-			return NULL;
+		if (null === $value) {
+			return null;
 		}
 
-		$fileStorage = $this->getFileStorageProvider()->get($value['storage'] ?? NULL);
+		$fileStorage = $this->getFileStorageProvider()->get($value['storage'] ?? null);
 		$pathInfo = $fileStorage->createPathInfo($value['path'] ?? '');
 
 		if (isset($value['version'])) {
@@ -75,31 +59,22 @@ class FileInfoType extends JsonType
 		return $fileStorage->createFileInfo($pathInfo);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function getName(): string
 	{
 		return self::NAME;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function requiresSQLCommentHint(AbstractPlatform $platform): bool
 	{
-		return TRUE;
+		return true;
 	}
 
-	/**
-	 * @return \SixtyEightPublishers\FileStorage\FileStorageProviderInterface
-	 */
 	private function getFileStorageProvider(): FileStorageProviderInterface
 	{
-		if (NULL === $this->fileStorageProvider) {
+		if (null === $this->fileStorageProvider) {
 			throw new RuntimeException(sprintf(
 				'Please call method %s::setFileStorageProvider().',
-				$this->fileStorageProvider
+				static::class
 			));
 		}
 

@@ -7,7 +7,7 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI;
 interface AssetsProviderInterface
 {
 	/**
-	 * @return \SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Assets[]
+	 * @return array<Assets>
 	 */
 	public function provideAssets(): array;
 }

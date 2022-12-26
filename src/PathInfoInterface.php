@@ -6,70 +6,28 @@ namespace SixtyEightPublishers\FileStorage;
 
 interface PathInfoInterface
 {
-	/**
-	 * @param string $namespace
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\PathInfoInterface|$this
-	 */
-	public function setNamespace(string $namespace): self;
+	public function setNamespace(string $namespace): static;
 
-	/**
-	 * @param string $name
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\PathInfoInterface|$this
-	 */
-	public function setName(string $name): self;
+	public function setName(string $name): static;
 
-	/**
-	 * @param string|NULL $extension
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\PathInfoInterface|$this
-	 */
-	public function setExtension(?string $extension): self;
+	public function setExtension(?string $extension): static;
 
-	/**
-	 * @param string $extension
-	 *
-	 * @return $this
-	 */
-	public function withExt(string $extension);
+	public function withExt(string $extension): static;
 
-	/**
-	 * @param string|NULL $version
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\PathInfoInterface|$this
-	 */
-	public function setVersion(?string $version): self;
+	public function setVersion(?string $version): static;
 
-	/**
-	 * @return string
-	 */
 	public function getNamespace(): string;
 
-	/**
-	 * @return string
-	 */
 	public function getName(): string;
 
-	/**
-	 * @return NULL|string
-	 */
 	public function getExtension(): ?string;
 
-	/**
-	 * @return NULL|string
-	 */
 	public function getVersion(): ?string;
 
-	/**
-	 * @return string
-	 */
 	public function getPath(): string;
 
 	/**
 	 * Calls ::getPath() internally.
-	 *
-	 * @return string
 	 */
 	public function __toString(): string;
 }

@@ -6,14 +6,13 @@ namespace SixtyEightPublishers\FileStorage;
 
 use IteratorAggregate;
 
+/**
+ * @extends IteratorAggregate<string, FileStorageInterface>
+ */
 interface FileStorageProviderInterface extends IteratorAggregate
 {
 	/**
-	 * NULL = default
-	 *
-	 * @param string|NULL $name
-	 *
-	 * @return \SixtyEightPublishers\FileStorage\FileStorageInterface
+	 * @param string|null $name Null is default
 	 */
-	public function get(?string $name = NULL): FileStorageInterface;
+	public function get(?string $name = null): FileStorageInterface;
 }

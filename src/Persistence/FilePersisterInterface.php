@@ -12,34 +12,22 @@ interface FilePersisterInterface
 {
 	public const OPTION_SUPPRESS_EXCEPTIONS = '68.suppress_exceptions';
 
-	/**
-	 * @return \League\Flysystem\FilesystemOperator
-	 */
 	public function getFilesystem(): FilesystemOperator;
 
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\PathInfoInterface $pathInfo
-	 *
-	 * @return bool
-	 */
 	public function exists(PathInfoInterface $pathInfo): bool;
 
 	/**
 	 * Returns path of stored image
 	 *
-	 * @param \SixtyEightPublishers\FileStorage\Resource\ResourceInterface $resource
-	 * @param array                                                        $config
+	 * @param array<string, mixed> $config
 	 *
-	 * @return string
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
 	 */
 	public function save(ResourceInterface $resource, array $config = []): string;
 
 	/**
-	 * @param \SixtyEightPublishers\FileStorage\PathInfoInterface $pathInfo
-	 * @param array                                               $config
+	 * @param array<string, mixed> $config
 	 *
-	 * @return void
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
 	 */
 	public function delete(PathInfoInterface $pathInfo, array $config = []): void;

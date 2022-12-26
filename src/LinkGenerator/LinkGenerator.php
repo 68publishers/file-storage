@@ -6,23 +6,16 @@ namespace SixtyEightPublishers\FileStorage\LinkGenerator;
 
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Config\ConfigInterface;
+use function implode;
+use function rawurldecode;
 
 class LinkGenerator implements LinkGeneratorInterface
 {
-	/** @var \SixtyEightPublishers\FileStorage\Config\ConfigInterface  */
-	private $config;
-
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\Config\ConfigInterface $config
-	 */
-	public function __construct(ConfigInterface $config)
-	{
-		$this->config = $config;
+	public function __construct(
+		private readonly ConfigInterface $config
+	) {
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function link(PathInfoInterface $pathInfo): string
 	{
 		$basePath = $this->config[ConfigInterface::BASE_PATH];
@@ -46,16 +39,14 @@ class LinkGenerator implements LinkGeneratorInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\FileStorage\PathInfoInterface $pathInfo
-	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	protected function buildQueryParams(PathInfoInterface $pathInfo): array
 	{
 		$params = [];
 
-		if (NULL !== $pathInfo->getVersion()) {
-			$versionParameterName = $this->config[ConfigInterface::VERSION_PARAMETER_NAME];
+		if (null !== $pathInfo->getVersion()) {
+			$versionParameterName = (string) $this->config[ConfigInterface::VERSION_PARAMETER_NAME];
 			$params[$versionParameterName] = $pathInfo->getVersion();
 		}
 

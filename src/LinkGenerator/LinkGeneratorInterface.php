@@ -8,10 +8,5 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 
 interface LinkGeneratorInterface
 {
-	/**
-	 * @param \SixtyEightPublishers\FileStorage\PathInfoInterface $pathInfo
-	 *
-	 * @return string
-	 */
 	public function link(PathInfoInterface $pathInfo): string;
 }

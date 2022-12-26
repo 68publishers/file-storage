@@ -6,19 +6,12 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI;
 
 final class Assets
 {
-	/** @var string  */
-	public $storageName;
-
-	/** @var array  */
-	public $paths;
-
 	/**
-	 * @param string $storageName
-	 * @param array  $paths
+	 * @param array<string> $paths
 	 */
-	public function __construct(string $storageName, array $paths)
-	{
-		$this->storageName = $storageName;
-		$this->paths = $paths;
+	public function __construct(
+		public readonly string $storageName,
+		public readonly array $paths
+	) {
 	}
 }

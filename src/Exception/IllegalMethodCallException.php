@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage\Exception;
 
 use BadMethodCallException;
+use function sprintf;
 
 final class IllegalMethodCallException extends BadMethodCallException implements ExceptionInterface
 {

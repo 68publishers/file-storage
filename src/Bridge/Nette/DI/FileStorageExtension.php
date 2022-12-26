@@ -39,72 +39,77 @@ use SixtyEightPublishers\FileStorage\Cleaner\StorageCleanerInterface;
 use SixtyEightPublishers\FileStorage\Cleaner\FileKeepResolverInterface;
 use SixtyEightPublishers\FileStorage\Resource\ResourceFactoryInterface;
 use SixtyEightPublishers\FileStorage\Persistence\FilePersisterInterface;
+use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\StorageConfig;
 use SixtyEightPublishers\FileStorage\LinkGenerator\LinkGeneratorInterface;
+use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\FilesystemConfig;
+use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\FileStorageConfig;
+use function count;
+use function assert;
+use function dirname;
+use function sprintf;
+use function array_filter;
+use function class_exists;
 
 final class FileStorageExtension extends CompilerExtension implements FileStorageDefinitionFactoryInterface
 {
-	/** @var string  */
-	private $rootDir;
+	private string $rootDir;
 
-	/**
-	 * @param string|NULL $rootDir
-	 */
-	public function __construct(?string $rootDir = NULL)
+	public function __construct(?string $rootDir = null)
 	{
 		$this->rootDir = $rootDir ?? $this->guessRootDir();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'storages' => Expect::arrayOf(Expect::structure([ # the first one storage is default
-				'config' => Expect::array([]),
-				'filesystem' => Expect::structure([
-					'adapter' => Expect::anyOf(Expect::string(), Expect::type(Statement::class))->required()->before(static function ($factory) {
-						return $factory instanceof Statement ? $factory : new Statement($factory);
-					}),
-					'config' => Expect::array([
-						FlysystemConfig::OPTION_VISIBILITY => Visibility::PUBLIC,
-						FlysystemConfig::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
-					])->mergeDefaults(TRUE),
-				]),
-				'assets' => Expect::arrayOf('string'),
-			])),
+			'storages' => Expect::arrayOf(
+				Expect::structure([ # the first one storage is default
+					'config' => Expect::array([]),
+					'filesystem' => Expect::structure([
+						'adapter' => Expect::anyOf(Expect::string(), Expect::type(Statement::class))->required()->before(static function ($factory) {
+							return $factory instanceof Statement ? $factory : new Statement($factory);
+						}),
+						'config' => Expect::array([
+							FlysystemConfig::OPTION_VISIBILITY => Visibility::PUBLIC,
+							FlysystemConfig::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
+						])->mergeDefaults(true),
+					])->castTo(FilesystemConfig::class),
+					'assets' => Expect::arrayOf('string', 'string'),
+				])->castTo(StorageConfig::class)
+			),
 		])->assert(static function (object $config) {
-			return 0 < count($config->storages);
-		});
+			return isset($config->storages) && 0 < count($config->storages);
+		})->castTo(FileStorageConfig::class);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
+		$config = $this->getConfig();
+		assert($config instanceof FileStorageConfig);
+
 		$factories = array_filter($this->compiler->getExtensions(FileStorageDefinitionFactoryInterface::class), function ($extension) {
 			return $extension !== $this;
 		});
 
 		$factories[] = $this;
 		$storageDefinitions = [];
-		$defaultStorageDefinition = NULL;
+		$defaultStorageDefinition = null;
 
-		foreach ($this->config->storages as $storageName => $storageConfig) {
-			/** @var \SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageDefinitionFactoryInterface $factory */
+		foreach ($config->storages as $storageName => $storageConfig) {
 			foreach ($factories as $factory) {
+				assert($factory instanceof FileStorageDefinitionFactoryInterface);
+
 				if (!$factory->canCreateFileStorage($storageName, $storageConfig)) {
 					continue;
 				}
 
 				$storageDefinition = $factory->createFileStorage($storageName, $storageConfig);
 
-				if (NULL === $defaultStorageDefinition) {
-					$defaultStorageDefinition = $storageDefinition->setAutowired(TRUE);
+				if (null === $defaultStorageDefinition) {
+					$defaultStorageDefinition = $storageDefinition->setAutowired(true);
 				} else {
-					$storageDefinitions[] = $storageDefinition->setAutowired(FALSE);
+					$storageDefinitions[] = $storageDefinition->setAutowired(false);
 				}
 
 				continue 2;
@@ -119,21 +124,15 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 			]);
 
 		$this->registerStorageCleaner();
-		$this->registerAssets();
+		$this->registerAssets($config);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function canCreateFileStorage(string $name, object $config): bool
 	{
-		return TRUE;
+		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function createFileStorage(string $name, object $config): Definition
+	public function createFileStorage(string $name, StorageConfig $config): Definition
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -143,27 +142,27 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 				$config->filesystem->adapter,
 				$config->filesystem->config,
 			])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('config.' . $name))
 			->setType(ConfigInterface::class)
 			->setFactory(Config::class, [$config->config])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('resource_factory.' . $name))
 			->setType(ResourceFactoryInterface::class)
 			->setFactory(ResourceFactory::class, [$this->prefix('@filesystem.' . $name)])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('link_generator.' . $name))
 			->setType(LinkGeneratorInterface::class)
 			->setFactory(LinkGenerator::class, [$this->prefix('@config.' . $name)])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('file_persister.' . $name))
 			->setType(FilePersisterInterface::class)
 			->setFactory(FilePersister::class, [$this->prefix('@filesystem.' . $name)])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		return $builder->addDefinition($this->prefix('file_storage.' . $name))
 			->setType(FileStorageInterface::class)
@@ -174,12 +173,9 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 				$this->prefix('@link_generator.' . $name),
 				$this->prefix('@file_persister.' . $name),
 			])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 	}
 
-	/**
-	 * @return void
-	 */
 	private function registerStorageCleaner(): void
 	{
 		$builder = $this->getContainerBuilder();
@@ -193,10 +189,7 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 			->setFactory(StorageCleaner::class);
 	}
 
-	/**
-	 * @return void
-	 */
-	private function registerAssets(): void
+	private function registerAssets(FileStorageConfig $config): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -205,17 +198,17 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 			->setFactory(Filesystem::class, [
 				new Statement(LocalFilesystemAdapter::class, [$this->rootDir]),
 			])
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('assets.asset_factory'))
 			->setType(AssetFactoryInterface::class)
 			->setFactory(AssetFactory::class)
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$provider = $builder->addDefinition($this->prefix('assets.paths_provider'))
 			->setType(PathsProviderInterface::class)
 			->setFactory(PathsProvider::class)
-			->setAutowired(FALSE);
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('assets.assets_copier'))
 			->setType(AssetsCopierInterface::class)
@@ -225,14 +218,15 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 				$this->prefix('@assets.asset_factory'),
 			]);
 
-		foreach ($this->config->storages as $storageName => $storageConfig) {
+		foreach ($config->storages as $storageName => $storageConfig) {
 			if (!empty($storageConfig->assets)) {
 				$provider->addSetup('addPaths', [$storageName, $storageConfig->assets]);
 			}
 		}
 
-		/** @var \SixtyEightPublishers\FileStorage\Bridge\Nette\DI\AssetsProviderInterface $assetsProviderExtension */
 		foreach ($this->compiler->getExtensions(AssetsProviderInterface::class) as $assetsProviderExtension) {
+			assert($assetsProviderExtension instanceof AssetsProviderInterface);
+
 			foreach ($assetsProviderExtension->provideAssets() as $assets) {
 				if (!empty($assets->paths)) {
 					$provider->addSetup('addPaths', [$assets->storageName, $assets->paths]);
@@ -242,7 +236,6 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 	}
 
 	/**
-	 * @return string
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\RuntimeException
 	 */
 	private function guessRootDir(): string
@@ -251,18 +244,18 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 			throw new RuntimeException(sprintf(
 				'Project root directory can\'t be detected because the class %s can\'t be found. Please provide the root directory manually into the %s::__construct().',
 				ClassLoader::class,
-				static::class
+				self::class
 			));
 		}
 
 		try {
 			$reflection = new ReflectionClass(ClassLoader::class);
 
-			return dirname($reflection->getFileName(), 3);
+			return dirname((string) $reflection->getFileName(), 3);
 		} catch (ReflectionException $e) {
 			throw new RuntimeException(sprintf(
 				'Project root directory can\'t be detected. Please provide the root directory manually  into the %s::__construct().',
-				static::class
+				self::class
 			), 0, $e);
 		}
 	}
