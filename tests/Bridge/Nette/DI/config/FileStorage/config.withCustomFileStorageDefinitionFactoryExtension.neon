@@ -1,0 +1,11 @@
+includes:
+	- ../base.neon
+
+extensions:
+	custom_file_storage_definition_factory_extension: SixtyEightPublishers\FileStorage\Tests\Fixtures\NetteDI\CustomFileStorageDefinitionFactoryExtension
+
+file_storage:
+	storages:
+		custom:
+			filesystem:
+				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/default)

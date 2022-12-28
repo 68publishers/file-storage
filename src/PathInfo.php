@@ -9,66 +9,58 @@ use function sprintf;
 
 class PathInfo implements PathInfoInterface
 {
-	private string $namespace;
-
-	private string $name;
-
-	private ?string $extension = null;
-
-	private ?string $version = null;
-
 	/**
 	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
 	 */
-	public function __construct(string $namespace, string $name, ?string $extension, ?string $version = null)
-	{
-		$this->setNamespace($namespace);
-		$this->setName($name);
-		$this->setExtension($extension);
-		$this->setVersion($version);
+	public function __construct(
+		private string $namespace,
+		private string $name,
+		private ?string $extension,
+		private ?string $version = null
+	) {
+		$this->validateName($name);
 	}
 
-	public function setNamespace(string $namespace): static
-	{
-		$this->namespace = $namespace;
-
-		return $this;
-	}
-
-	/**
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
-	 */
-	public function setName(string $name): static
-	{
-		if ($name === '') {
-			throw PathInfoException::invalidPath($name);
-		}
-
-		$this->name = $name;
-
-		return $this;
-	}
-
-	public function setExtension(?string $extension): static
-	{
-		$this->extension = $extension;
-
-		return $this;
-	}
-
-	public function withExt(string $extension): static
+	public function withNamespace(string $namespace): static
 	{
 		$info = clone $this;
-		$info->setExtension($extension);
+		$info->namespace = $namespace;
 
 		return $info;
 	}
 
-	public function setVersion(?string $version): static
+	/**
+	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
+	 */
+	public function withName(string $name): static
 	{
-		$this->version = $version;
+		$this->validateName($name);
 
-		return $this;
+		$info = clone $this;
+		$info->name = $name;
+
+		return $info;
+	}
+
+	public function withExtension(?string $extension): static
+	{
+		$info = clone $this;
+		$info->extension = $extension;
+
+		return $info;
+	}
+
+	public function withExt(?string $extension): static
+	{
+		return $this->withExtension($extension);
+	}
+
+	public function withVersion(?string $version): static
+	{
+		$info = clone $this;
+		$info->version = $version;
+
+		return $info;
 	}
 
 	public function getNamespace(): string
@@ -93,15 +85,31 @@ class PathInfo implements PathInfoInterface
 
 	public function getPath(): string
 	{
-		$namespace = $this->getNamespace();
-
-		return $namespace === ''
-			? $this->getName()
-			: sprintf('%s/%s%s', $namespace, $this->getName(), null === $this->getExtension() ? '' : '.' . $this->getExtension());
+		return $this->createPath();
 	}
 
 	public function __toString(): string
 	{
 		return $this->getPath();
+	}
+
+	/**
+	 * @throws \SixtyEightPublishers\FileStorage\Exception\PathInfoException
+	 */
+	private function validateName(string $name): void
+	{
+		if ($name === '') {
+			throw PathInfoException::invalidPath($this->createPath($name));
+		}
+	}
+
+	private function createPath(?string $name = null): string
+	{
+		$name = $name ?? $this->getName();
+		$namespace = $this->getNamespace();
+
+		return $namespace === ''
+			? sprintf('%s%s', $name, null === $this->getExtension() ? '' : '.' . $this->getExtension())
+			: sprintf('%s/%s%s', $namespace, $name, null === $this->getExtension() ? '' : '.' . $this->getExtension());
 	}
 }

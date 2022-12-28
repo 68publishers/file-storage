@@ -38,7 +38,7 @@ final class ResourceFactory implements ResourceFactoryInterface
 			$source = $this->filesystemReader->readStream($path);
 		} catch (LeagueFilesystemException $e) {
 			throw new FilesystemException(sprintf(
-				'Can not read stream from file %s',
+				'Can not read stream from file "%s".',
 				$path
 			), 0, $e);
 		}
@@ -58,7 +58,7 @@ final class ResourceFactory implements ResourceFactoryInterface
 
 		if (false === $resource) {
 			throw new FilesystemException(sprintf(
-				'Can not read stream from file %s. %s',
+				'Can not read stream from file "%s". %s',
 				$filename,
 				error_get_last()['message'] ?? ''
 			), 0);

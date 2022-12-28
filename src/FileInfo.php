@@ -25,28 +25,31 @@ class FileInfo implements FileInfoInterface
 		return $this->linkGenerator->link($this->pathInfo);
 	}
 
-	public function setNamespace(string $namespace): static
+	public function withNamespace(string $namespace): static
 	{
-		$this->pathInfo->setNamespace($namespace);
+		$info = clone $this;
+		$info->pathInfo = $this->pathInfo->withNamespace($namespace);
 
-		return $this;
+		return $info;
 	}
 
-	public function setName(string $name): static
+	public function withName(string $name): static
 	{
-		$this->pathInfo->setName($name);
+		$info = clone $this;
+		$info->pathInfo = $this->pathInfo->withName($name);
 
-		return $this;
+		return $info;
 	}
 
-	public function setExtension(?string $extension): static
+	public function withExtension(?string $extension): static
 	{
-		$this->pathInfo->setExtension($extension);
+		$info = clone $this;
+		$info->pathInfo = $this->pathInfo->withExtension($extension);
 
-		return $this;
+		return $info;
 	}
 
-	public function withExt(string $extension): static
+	public function withExt(?string $extension): static
 	{
 		$info = clone $this;
 		$info->pathInfo = $this->pathInfo->withExt($extension);
@@ -54,11 +57,12 @@ class FileInfo implements FileInfoInterface
 		return $info;
 	}
 
-	public function setVersion(?string $version): static
+	public function withVersion(?string $version): static
 	{
-		$this->pathInfo->setVersion($version);
+		$info = clone $this;
+		$info->pathInfo = $this->pathInfo->withVersion($version);
 
-		return $this;
+		return $info;
 	}
 
 	public function getNamespace(): string

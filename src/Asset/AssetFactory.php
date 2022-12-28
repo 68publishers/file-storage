@@ -7,13 +7,10 @@ namespace SixtyEightPublishers\FileStorage\Asset;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\FilesystemOperator;
-use SixtyEightPublishers\FileStorage\Exception\InvalidArgumentException;
 use function trim;
 use function rtrim;
 use function strlen;
 use function substr;
-use function sprintf;
-use function strncmp;
 use function str_replace;
 
 final class AssetFactory implements AssetFactoryInterface
@@ -38,14 +35,6 @@ final class AssetFactory implements AssetFactoryInterface
 				return $attributes->isFile();
 			})
 			->map(static function (StorageAttributes $attributes) use ($normalizedDirectory, $to) {
-				if (0 !== strncmp($attributes->path(), $normalizedDirectory, strlen($normalizedDirectory))) {
-					throw new InvalidArgumentException(sprintf(
-						'Invalid asset paths. A path %s must starts with %s',
-						$attributes->path(),
-						$normalizedDirectory
-					));
-				}
-
 				$namespace = empty($to) ? '' : $to . '/';
 
 				return new Asset($attributes->path(), $namespace . substr($attributes->path(), strlen($normalizedDirectory)));

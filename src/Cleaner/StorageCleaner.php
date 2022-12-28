@@ -24,7 +24,7 @@ final class StorageCleaner implements StorageCleanerInterface
 	 */
 	public function getCount(FilesystemOperator $filesystemOperator, array $options = []): int
 	{
-		$contents = $filesystemOperator->listContents(($options[self::OPTION_FILESYSTEM_PREFIX ] ?? '') . ($options[self::OPTION_NAMESPACE] ?? ''), FilesystemReader::LIST_DEEP)
+		$contents = $filesystemOperator->listContents(($options[self::OPTION_FILESYSTEM_PREFIX] ?? '') . ($options[self::OPTION_NAMESPACE] ?? ''), FilesystemReader::LIST_DEEP)
 			->filter(function (StorageAttributes $attributes) {
 				if (!$attributes->isFile()) {
 					return false;
@@ -44,7 +44,7 @@ final class StorageCleaner implements StorageCleanerInterface
 	 */
 	public function clean(FilesystemOperator $filesystemOperator, array $options = []): void
 	{
-		$prefix = $options[self::OPTION_FILESYSTEM_PREFIX ] ?? '';
+		$prefix = $options[self::OPTION_FILESYSTEM_PREFIX] ?? '';
 		$contents = $filesystemOperator->listContents($prefix . ($options[self::OPTION_NAMESPACE] ?? ''), FilesystemReader::LIST_SHALLOW)
 			->filter(function (StorageAttributes $attributes) {
 				if (!$attributes->isFile()) {
@@ -60,13 +60,13 @@ final class StorageCleaner implements StorageCleanerInterface
 			assert($attributes instanceof StorageAttributes);
 
 			if ($attributes->isDir()) {
-				$filesystemOperator->deleteDirectory($prefix . $attributes->path());
+				$filesystemOperator->deleteDirectory($attributes->path());
 
 				continue;
 			}
 
 			if ($attributes->isFile()) {
-				$filesystemOperator->delete($prefix . $attributes->path());
+				$filesystemOperator->delete($attributes->path());
 			}
 		}
 	}
