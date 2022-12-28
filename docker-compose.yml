@@ -9,3 +9,12 @@ services:
         container_name: 68publishers.file-storage.81
         volumes:
             - .:/var/www/html:cached
+
+    php82:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: php82
+        container_name: 68publishers.file-storage.82
+        volumes:
+            - .:/var/www/html:cached
