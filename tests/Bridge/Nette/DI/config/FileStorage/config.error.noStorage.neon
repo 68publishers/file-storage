@@ -1,0 +1,2 @@
+extensions:
+	file_storage: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageExtension(%cwd%)

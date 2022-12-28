@@ -1,0 +1,21 @@
+extensions:
+	file_storage: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageExtension(%cwd%)
+
+file_storage:
+	storages:
+		default:
+			config:
+				base_path: files
+			filesystem:
+				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/default)
+			assets:
+				assets/config.json: copied/config.json
+				assets/images: copied/images
+		other:
+			config:
+				host: https://www.example.com/data
+			filesystem:
+				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/other)
+			assets:
+				assets/config.json: copied/conf/config.test.json
+				assets/images: copied

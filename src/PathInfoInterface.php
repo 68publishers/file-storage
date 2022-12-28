@@ -6,15 +6,18 @@ namespace SixtyEightPublishers\FileStorage;
 
 interface PathInfoInterface
 {
-	public function setNamespace(string $namespace): static;
+	public function withNamespace(string $namespace): static;
 
-	public function setName(string $name): static;
+	public function withName(string $name): static;
 
-	public function setExtension(?string $extension): static;
+	public function withExtension(?string $extension): static;
 
-	public function withExt(string $extension): static;
+	/**
+	 * Alias for withExtension()
+	 */
+	public function withExt(?string $extension): static;
 
-	public function setVersion(?string $version): static;
+	public function withVersion(?string $version): static;
 
 	public function getNamespace(): string;
 

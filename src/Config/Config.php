@@ -45,7 +45,7 @@ class Config implements ConfigInterface
 	{
 		if (!$this->offsetExists($offset)) {
 			throw new InvalidArgumentException(sprintf(
-				'Missing a configuration option %s',
+				'Missing a configuration option "%s".',
 				$offset
 			));
 		}

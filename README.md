@@ -225,7 +225,7 @@ The package provides custom Doctrine DBAL type `file_info`. You can register it 
 <?php
 
 use Doctrine\DBAL\Types\Type;
-use SixtyEightPublishers\FileStorage\Bridge\Doctrine\DbalType\FileInfo\FileInfoType;
+use SixtyEightPublishers\FileStorage\Bridge\Doctrine\DbalType\FileInfoType;
 
 /** @var \SixtyEightPublishers\FileStorage\FileStorageProviderInterface $fileStorageProvider */
 

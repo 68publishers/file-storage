@@ -1,0 +1,5 @@
+includes:
+	- ../base.neon
+
+extensions:
+	assets_provider_extension: SixtyEightPublishers\FileStorage\Tests\Fixtures\NetteDI\AssetsProviderExtension

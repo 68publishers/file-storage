@@ -13,8 +13,8 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Visibility;
 use Composer\Autoload\ClassLoader;
 use Nette\DI\Definitions\Statement;
-use Nette\DI\Definitions\Definition;
 use League\Flysystem\FilesystemOperator;
+use Nette\DI\Definitions\ServiceDefinition;
 use League\Flysystem\Config as FlysystemConfig;
 use SixtyEightPublishers\FileStorage\FileStorage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -72,14 +72,15 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 						'config' => Expect::array([
 							FlysystemConfig::OPTION_VISIBILITY => Visibility::PUBLIC,
 							FlysystemConfig::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
-						])->mergeDefaults(true),
+						])->mergeDefaults(),
 					])->castTo(FilesystemConfig::class),
 					'assets' => Expect::arrayOf('string', 'string'),
 				])->castTo(StorageConfig::class)
 			),
 		])->assert(static function (object $config) {
 			return isset($config->storages) && 0 < count($config->storages);
-		})->castTo(FileStorageConfig::class);
+		}, 'At least one storage must be defined.')
+			->castTo(FileStorageConfig::class);
 	}
 
 	public function loadConfiguration(): void
@@ -107,7 +108,7 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 				$storageDefinition = $factory->createFileStorage($storageName, $storageConfig);
 
 				if (null === $defaultStorageDefinition) {
-					$defaultStorageDefinition = $storageDefinition->setAutowired(true);
+					$defaultStorageDefinition = $storageDefinition->setAutowired();
 				} else {
 					$storageDefinitions[] = $storageDefinition->setAutowired(false);
 				}
@@ -132,15 +133,15 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
 		return true;
 	}
 
-	public function createFileStorage(string $name, StorageConfig $config): Definition
+	public function createFileStorage(string $name, StorageConfig $config): ServiceDefinition
 	{
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('filesystem.' . $name))
 			->setType(FilesystemOperator::class)
 			->setFactory(Filesystem::class, [
-				$config->filesystem->adapter,
-				$config->filesystem->config,
+				'adapter' => $config->filesystem->adapter,
+				'config' => $config->filesystem->config,
 			])
 			->setAutowired(false);
 
