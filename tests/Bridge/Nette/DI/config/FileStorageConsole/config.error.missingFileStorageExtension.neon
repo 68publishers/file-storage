@@ -1,0 +1,5 @@
+includes:
+	- console.neon
+
+extensions:
+	file_storage.console: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageConsoleExtension

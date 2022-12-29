@@ -7,7 +7,7 @@ file_storage:
 			config:
 				base_path: files
 			filesystem:
-				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/default)
+				adapter: League\Flysystem\InMemory\InMemoryFilesystemAdapter
 			assets:
 				assets/config.json: copied/config.json
 				assets/images: copied/images
@@ -15,7 +15,7 @@ file_storage:
 			config:
 				host: https://www.example.com/data
 			filesystem:
-				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/other)
+				adapter: League\Flysystem\InMemory\InMemoryFilesystemAdapter
 			assets:
 				assets/config.json: copied/conf/config.test.json
 				assets/images: copied

@@ -11,3 +11,7 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 
 Environment::setup();
 Environment::bypassFinals();
+
+if (PHP_VERSION_ID >= 80200) {
+	error_reporting(~E_DEPRECATED);
+}

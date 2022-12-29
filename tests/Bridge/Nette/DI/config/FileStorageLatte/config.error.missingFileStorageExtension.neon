@@ -1,0 +1,2 @@
+extensions:
+	file_storage.latte: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageLatteExtension

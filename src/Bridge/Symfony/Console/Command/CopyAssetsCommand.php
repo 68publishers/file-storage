@@ -13,6 +13,7 @@ use SixtyEightPublishers\FileStorage\FileStorageInterface;
 use SixtyEightPublishers\FileStorage\Asset\AssetsCopierInterface;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use function assert;
+use function is_string;
 use function iterator_to_array;
 
 final class CopyAssetsCommand extends Command
@@ -36,7 +37,7 @@ final class CopyAssetsCommand extends Command
 		$storageName = $input->getArgument('storage');
 		$logger = new ConsoleLogger($output);
 
-		foreach (null !== $storageName ? [$this->fileStorageProvider->get($storageName)] : iterator_to_array($this->fileStorageProvider) as $storage) {
+		foreach (is_string($storageName) ? [$this->fileStorageProvider->get($storageName)] : iterator_to_array($this->fileStorageProvider) as $storage) {
 			assert($storage instanceof FileStorageInterface);
 
 			$this->assetsCopier->copy($storage, $logger);

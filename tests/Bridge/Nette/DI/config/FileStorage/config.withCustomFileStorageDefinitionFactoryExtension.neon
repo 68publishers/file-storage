@@ -8,4 +8,4 @@ file_storage:
 	storages:
 		custom:
 			filesystem:
-				adapter: League\Flysystem\Local\LocalFilesystemAdapter(%cwd%/data/default)
+				adapter: League\Flysystem\InMemory\InMemoryFilesystemAdapter()

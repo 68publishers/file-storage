@@ -3,10 +3,6 @@ includes:
 	- vendor/phpstan/phpstan-nette/rules.neon
 
 parameters:
-	level: 8
+	level: 9
 	paths:
 		- src
-	ignoreErrors:
-		-
-			message: '~If condition is always false\.~'
-			path: src/Bridge/Nette/DI/FileStorageLatteExtension.php

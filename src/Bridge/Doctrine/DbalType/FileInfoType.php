@@ -12,6 +12,9 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use SixtyEightPublishers\DoctrineBridge\Type\ContainerAwareTypeInterface;
+use function assert;
+use function is_array;
+use function is_string;
 
 class FileInfoType extends JsonType implements ContainerAwareTypeInterface
 {
@@ -41,18 +44,23 @@ class FileInfoType extends JsonType implements ContainerAwareTypeInterface
 			$fileStorage = $this->getFileStorageProvider()->get();
 
 			if (!$value instanceof PathInfoInterface) {
-				$value = $fileStorage->createPathInfo((string) $value);
+				assert(is_string($value));
+				$value = $fileStorage->createPathInfo($value);
 			}
 
 			$value = $fileStorage->createFileInfo($value);
 		}
 
-		return parent::convertToDatabaseValue($value, $platform);
+		$value = parent::convertToDatabaseValue($value, $platform);
+		assert(null === $value || is_string($value));
+
+		return $value;
 	}
 
 	public function convertToPHPValue($value, AbstractPlatform $platform): ?FileInfoInterface
 	{
 		$value = parent::convertToPHPValue($value, $platform);
+		assert(null === $value || is_array($value));
 
 		if (null === $value) {
 			return null;

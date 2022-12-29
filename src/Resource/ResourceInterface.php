@@ -11,7 +11,7 @@ interface ResourceInterface
 	public function getPathInfo(): PathInfoInterface;
 
 	/**
-	 * @return mixed|resource
+	 * @return string|resource
 	 */
 	public function getSource(): mixed;
 
