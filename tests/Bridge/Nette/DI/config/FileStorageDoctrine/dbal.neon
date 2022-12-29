@@ -1,0 +1,11 @@
+services:
+	dbal_connection:
+		type: Doctrine\DBAL\Connection
+		factory: Doctrine\DBAL\DriverManager::getConnection([
+			dbname: mydb
+			user: user
+			password: secret
+			host: localhost
+			driver: pdo_pgsql
+			serverVersion: 3.40.0
+		])

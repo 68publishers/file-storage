@@ -1,0 +1,12 @@
+includes:
+	- ../base.neon
+	- console.neon
+
+extensions:
+	file_storage.console: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageConsoleExtension
+
+services:
+	-
+		type: SixtyEightPublishers\FileStorage\Tests\Fixtures\CustomCleanCommandConfigurator
+		tags:
+			- 68publishers.file_storage.console.clean_command_configurator

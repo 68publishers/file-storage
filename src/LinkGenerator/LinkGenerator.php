@@ -7,6 +7,7 @@ namespace SixtyEightPublishers\FileStorage\LinkGenerator;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Config\ConfigInterface;
 use function implode;
+use function is_string;
 use function rawurldecode;
 
 class LinkGenerator implements LinkGeneratorInterface
@@ -46,8 +47,8 @@ class LinkGenerator implements LinkGeneratorInterface
 		$params = [];
 
 		if (null !== $pathInfo->getVersion()) {
-			$versionParameterName = (string) $this->config[ConfigInterface::VERSION_PARAMETER_NAME];
-			$params[$versionParameterName] = $pathInfo->getVersion();
+			$versionParameterName = $this->config[ConfigInterface::VERSION_PARAMETER_NAME];
+			$params[is_string($versionParameterName) ? $versionParameterName : ''] = $pathInfo->getVersion();
 		}
 
 		return $params;

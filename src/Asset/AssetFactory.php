@@ -30,7 +30,8 @@ final class AssetFactory implements AssetFactoryInterface
 
 		$normalizedDirectory = str_replace('\\', '/', rtrim($from, '\\/')) . '/';
 
-		return $localFilesystem->listContents($normalizedDirectory, FilesystemReader::LIST_DEEP)
+		/** @var array<AssetInterface> $assets */
+		$assets = $localFilesystem->listContents($normalizedDirectory, FilesystemReader::LIST_DEEP)
 			->filter(static function (StorageAttributes $attributes) {
 				return $attributes->isFile();
 			})
@@ -40,5 +41,7 @@ final class AssetFactory implements AssetFactoryInterface
 				return new Asset($attributes->path(), $namespace . substr($attributes->path(), strlen($normalizedDirectory)));
 			})
 			->toArray();
+
+		return $assets;
 	}
 }

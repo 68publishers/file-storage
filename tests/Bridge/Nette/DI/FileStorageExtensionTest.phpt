@@ -16,6 +16,7 @@ use Nette\DI\InvalidConfigurationException;
 use League\Flysystem\Config as FlysystemConfig;
 use SixtyEightPublishers\FileStorage\FileStorage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use SixtyEightPublishers\FileStorage\Asset\AssetsCopier;
 use SixtyEightPublishers\FileStorage\Asset\PathsProvider;
 use SixtyEightPublishers\FileStorage\FileStorageProvider;
@@ -124,8 +125,8 @@ final class FileStorageExtensionTest extends TestCase
 			FlysystemConfig::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
 		];
 
-		$this->assertLocalFilesystem($defaultFilesystem, $options, __DIR__ . '/data/default');
-		$this->assertLocalFilesystem($otherFilesystem, $options, __DIR__ . '/data/other');
+		$this->assertInMemoryFilesystem($defaultFilesystem, $options);
+		$this->assertInMemoryFilesystem($otherFilesystem, $options);
 	}
 
 	private function assertLocalFilesystem(Filesystem $filesystem, array $configOptions, string $rootLocation): void
@@ -148,6 +149,21 @@ final class FileStorageExtensionTest extends TestCase
 					null,
 					LocalFilesystemAdapter::class
 				));
+			},
+			null,
+			Filesystem::class
+		));
+	}
+
+	private function assertInMemoryFilesystem(Filesystem $filesystem, array $configOptions): void
+	{
+		call_user_func(Closure::bind(
+			static function () use ($filesystem, $configOptions): void {
+				Assert::type(InMemoryFilesystemAdapter::class, $filesystem->adapter);
+
+				foreach ($configOptions as $opt => $value) {
+					Assert::same($value, $filesystem->config->get($opt));
+				}
 			},
 			null,
 			Filesystem::class

@@ -1,0 +1,11 @@
+includes:
+	- ../base.neon
+	- dbal.neon
+
+extensions:
+	bridge: SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DoctrineBridgeExtension
+	file_storage.doctrine: SixtyEightPublishers\FileStorage\Bridge\Nette\DI\FileStorageDoctrineExtension
+
+bridge:
+	services:
+		dbal_connection: @dbal_connection

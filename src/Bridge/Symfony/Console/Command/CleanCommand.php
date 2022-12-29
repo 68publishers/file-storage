@@ -18,6 +18,7 @@ use function assert;
 use function implode;
 use function array_map;
 use function array_sum;
+use function is_string;
 use function array_keys;
 use function iterator_to_array;
 
@@ -45,7 +46,7 @@ class CleanCommand extends Command
 		$storageName = $input->getArgument('storage');
 		$cleanerOptions = $this->cleanCommandConfigurator->getCleanerOptions($input);
 
-		if (null !== $storageName) {
+		if (is_string($storageName)) {
 			$storage = $this->fileStorageProvider->get($storageName);
 			$filesystem = $storage->getFilesystem();
 			$deleteCount = $this->storageCleaner->getCount($filesystem, $cleanerOptions);

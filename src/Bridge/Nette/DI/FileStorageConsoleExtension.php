@@ -47,7 +47,8 @@ final class FileStorageConsoleExtension extends CompilerExtension
 			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('command.clean'))
-			->setType(CleanCommand::class);
+			->setType(CleanCommand::class)
+			->setArgument('cleanCommandConfigurator', new Reference($this->prefix('configurator.clean_command.registry')));
 
 		# Copy assets command
 		$builder->addDefinition($this->prefix('command.copy_assets'))

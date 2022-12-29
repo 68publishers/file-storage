@@ -9,7 +9,7 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 class SimpleResource implements ResourceInterface
 {
 	/**
-	 * @param mixed|resource $source
+	 * @param string|resource $source
 	 */
 	public function __construct(
 		private PathInfoInterface $pathInfo,

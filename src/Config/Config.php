@@ -9,6 +9,7 @@ use SixtyEightPublishers\FileStorage\Exception\IllegalMethodCallException;
 use function trim;
 use function rtrim;
 use function sprintf;
+use function is_string;
 use function array_merge;
 use function array_key_exists;
 
@@ -29,10 +30,10 @@ class Config implements ConfigInterface
 		$this->config = array_merge($this->config, $config);
 
 		// trim base path
-		$this->config[self::BASE_PATH] = trim((string) $this->config[self::BASE_PATH], '/');
+		$this->config[self::BASE_PATH] = is_string($this->config[self::BASE_PATH]) ? trim($this->config[self::BASE_PATH], '/') : '';
 
-		if (!empty($this->config[self::HOST])) {
-			$this->config[self::HOST] = rtrim((string) $this->config[self::HOST], '/');
+		if (!empty($this->config[self::HOST]) && is_string($this->config[self::HOST])) {
+			$this->config[self::HOST] = rtrim($this->config[self::HOST], '/');
 		}
 	}
 

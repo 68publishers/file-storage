@@ -36,13 +36,13 @@ extensions:
                 base_path: /data/files
             filesystem:
                 adapter: League\Flysystem\Local\LocalFilesystemAdapter(%wwwDir%/data/files)
-                config: # an optional config for filesystem adapter
+                config: [] # an optional config for filesystem adapter
             assets:
                 path/to/file.png: my/file.png # single file copying
                 path/to/directory: my-directory # copy whole directory
         s3:
             config:
-                host: https://my-buket.s3.amazonaws.com
+                host: https://my-bucket.s3.amazonaws.com
             filesystem:
                 adapter: League\Flysystem\AwsS3V3\AwsS3V3Adapter(@s3client, my-bucket)
 ```
@@ -53,19 +53,18 @@ extensions:
 |------------------------|----------------|---------|-------------------------------------------------------------------------------------------------|
 | base_path              | string         | `''`    | Base path to a directory where the files are accessible.                                        |
 | host                   | null or string | `null`  | Hostname, use if the files are not stored locally or if you want to generate an absolute links. |
-| version_parameter_name | `_v`           | default | Name of a version parameter in URL.                                                             |
+| version_parameter_name | string         | `_v`    | Name of a version parameter in URL.                                                             |
 
 ### Basic usage
 
 Generated DI Container will contain an autowired services of type `FileStorageProviderInterface` and `FileStorageInterface` (the default storage).
 
 ```php
-<?php
-
+use Nette\DI\Container;
 use SixtyEightPublishers\FileStorage\FileStorageInterface;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 
-/** @var \Nette\DI\Container $container */
+/** @var Container $container */
 
 $defaultStorage = $container->getByType(FileStorageInterface::class);
 
@@ -80,11 +79,11 @@ $s3storage = $provider->get('s3');
 #### Persisting files
 
 ```php
-<?php
+use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
-/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface $storage */
+/** @var FileStorageInterface $storage */
 
-# Create resource from local file:
+# Create a resource from a local file:
 $resource = $storage->createResourceFromLocalFile(
     $storage->createPathInfo('test/invoice.pdf'),
     __DIR__ . '/path/to/invoice.pdf'
@@ -106,9 +105,9 @@ $storage->save($resource->withPathInfo(
 #### Check a file existence
 
 ```php
-<?php
+use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
-/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface $storage */
+/** @var FileStorageInterface $storage */
 
 if ($storage->exists($storage->createPathInfo('test/invoice.pdf'))) {
     echo 'file exists!';
@@ -118,9 +117,9 @@ if ($storage->exists($storage->createPathInfo('test/invoice.pdf'))) {
 #### Deleting files
 
 ```php
-<?php
+use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
-/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface $storage */
+/** @var FileStorageInterface $storage */
 
 $storage->delete($storage->createPathInfo('test/invoice.pdf'));
 ```
@@ -128,9 +127,9 @@ $storage->delete($storage->createPathInfo('test/invoice.pdf'));
 #### Create links to files
 
 ```php
-<?php
+use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
-/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface $storage */
+/** @var FileStorageInterface $storage */
 
 # /data/files/test/invoice.pdf
 echo $storage->link($storage->createPathInfo('test/invoice.pdf'));
@@ -145,43 +144,41 @@ echo $fileInfo->link();
 #### Cleaning the storage
 
 ```php
-<?php
-
+use Nette\DI\Container;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use SixtyEightPublishers\FileStorage\Cleaner\StorageCleanerInterface;
 
-/** @var \Nette\DI\Container $container */
+/** @var Container $container */
 
 $cleaner = $container->getByType(StorageCleanerInterface::class);
 $provider = $container->getByType(FileStorageProviderInterface::class);
 $storage = $provider->get('default');
 
-# get files count in specific namespace:
+# get files count in the specific namespace:
 $cleaner->getCount($storage->getFilesystem(), [
     StorageCleanerInterface::OPTION_NAMESPACE => 'test',
 ]);
 
-# get files count in whole storage:
+# get files count in the whole storage:
 $cleaner->getCount($storage->getFilesystem());
 
-# remove files in specific namespace:
+# remove files in the specific namespace:
 $cleaner->clean($storage->getFilesystem(), [
     StorageCleanerInterface::OPTION_NAMESPACE => 'test',
 ]);
 
-# clean whole storage:
+# clean the whole storage:
 $cleaner->clean($storage->getFilesystem());
 ```
 
 #### Assets copying
 
 ```php
-<?php
-
+use Nette\DI\Container;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use SixtyEightPublishers\FileStorage\Asset\AssetsCopierInterface;
 
-/** @var \Nette\DI\Container $container */
+/** @var Container $container */
 
 $copier = $container->getByType(AssetsCopierInterface::class);
 $provider = $container->getByType(FileStorageProviderInterface::class);
@@ -194,17 +191,12 @@ $copier->copy($provider->get('s3'));
 Assets can be defined in the configuration under each storage separately but compiler extensions can define other assets:
 
 ```php
-<?php
-
 use Nette\DI\CompilerExtension;
 use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Assets;
 use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\AssetsProviderInterface;
 
 final class MyCompilerExtension extends CompilerExtension implements AssetsProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function provideAssets() : array
     {
         return [
@@ -222,12 +214,11 @@ final class MyCompilerExtension extends CompilerExtension implements AssetsProvi
 The package provides custom Doctrine DBAL type `file_info`. You can register it manually in this way:
 
 ```php
-<?php
-
 use Doctrine\DBAL\Types\Type;
+use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use SixtyEightPublishers\FileStorage\Bridge\Doctrine\DbalType\FileInfoType;
 
-/** @var \SixtyEightPublishers\FileStorage\FileStorageProviderInterface $fileStorageProvider */
+/** @var FileStorageProviderInterface $fileStorageProvider */
 
 Type::addType(FileInfoType::NAME, FileInfoType::class);
 
@@ -235,7 +226,7 @@ Type::addType(FileInfoType::NAME, FileInfoType::class);
 Type::getType(FileInfoType::NAME)->setFileStorageProvider($fileStorageProvider);
 ```
 
-Or you can use a compiler extension `FileStorageDoctrineExtension` but the extension requires an integration of package [68publishers/doctrine-bridge](https://github.com/68publishers/doctrine-bridge).
+Or you can use a compiler extension `FileStorageDoctrineExtension`. The extension requires an integration of package [68publishers/doctrine-bridge](https://github.com/68publishers/doctrine-bridge).
 
 ```neon
 extensions:
@@ -248,8 +239,6 @@ extensions:
 #### Example entity and persistence
 
 ```php
-<?php
-
 use Doctrine\ORM\Mapping as ORM;
 use SixtyEightPublishers\FileStorage\FileInfoInterface;
 
@@ -262,10 +251,8 @@ class File
 
     /**
      * @ORM\Column(type="file_info")
-     *
-     * @var \SixtyEightPublishers\FileStorage\FileInfoInterface
      */
-    protected $source;
+    private FileInfoInterface $source;
 
     public function __construct(FileInfoInterface $source)
     {
@@ -280,15 +267,18 @@ class File
 ```
 
 ```php
-/** @var Doctrine\ORM\EntityManagerInterface $em */
-/** @var \SixtyEightPublishers\FileStorage\FileStorageInterface $storage */
+use Doctrine\ORM\EntityManagerInterface;
+use SixtyEightPublishers\FileStorage\FileStorageInterface;
+
+/** @var EntityManagerInterface $em */
+/** @var FileStorageInterface $storage */
 
 $pathInfo = $storage->createPathInfo('test/avatar.png');
 $resource = $storage->createResourceFromLocalFile($pathInfo, __DIR__ . '/path/to/uploaded/file.png');
 
 $storage->save($resource);
 
-$pathInfo->setVersion(time());
+$pathInfo = $pathInfo->withVersion(time());
 $entity = new File($storage->createFileInfo($pathInfo));
 
 $em->persist($entity);

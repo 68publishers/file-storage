@@ -42,7 +42,7 @@ class FilePersister implements FilePersisterInterface
 			if (is_resource($source)) {
 				$this->filesystemOperator->writeStream($path, $resource->getSource(), $config);
 			} else {
-				$this->filesystemOperator->write($path, (string) $source, $config);
+				$this->filesystemOperator->write($path, $source, $config);
 			}
 
 			return $path;
