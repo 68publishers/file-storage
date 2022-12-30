@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\FileStorage\Tests\Helper;
+namespace SixtyEightPublishers\FileStorage\Tests;
 
 use Mockery;
 use Tester\Assert;
