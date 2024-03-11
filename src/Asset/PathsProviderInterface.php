@@ -6,8 +6,8 @@ namespace SixtyEightPublishers\FileStorage\Asset;
 
 interface PathsProviderInterface
 {
-	/**
-	 * @return array<string, string>
-	 */
-	public function getPaths(string $name): array;
+    /**
+     * @return array<string, string>
+     */
+    public function getPaths(string $name): array;
 }

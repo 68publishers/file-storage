@@ -8,8 +8,8 @@ use Nette\DI\Definitions\Statement;
 
 final class FilesystemConfig
 {
-	public Statement $adapter;
+    public Statement $adapter;
 
-	/** @var array<string, mixed> */
-	public array $config;
+    /** @var array<string, mixed> */
+    public array $config;
 }

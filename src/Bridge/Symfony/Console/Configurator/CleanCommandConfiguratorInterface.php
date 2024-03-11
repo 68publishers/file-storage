@@ -9,10 +9,10 @@ use Symfony\Component\Console\Input\InputInterface;
 
 interface CleanCommandConfiguratorInterface
 {
-	public function setupOptions(Command $command): void;
+    public function setupOptions(Command $command): void;
 
-	/**
-	 * @return array<string, mixed>
-	 */
-	public function getCleanerOptions(InputInterface $input): array;
+    /**
+     * @return array<string, mixed>
+     */
+    public function getCleanerOptions(InputInterface $input): array;
 }

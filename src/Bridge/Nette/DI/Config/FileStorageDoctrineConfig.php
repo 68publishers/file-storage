@@ -6,5 +6,5 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config;
 
 final class FileStorageDoctrineConfig
 {
-	public string $type_name;
+    public string $type_name;
 }

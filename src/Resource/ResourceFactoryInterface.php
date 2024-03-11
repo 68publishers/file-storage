@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\FileStorage\Resource;
 
+use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
+use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
 
 interface ResourceFactoryInterface
 {
-	/**
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\FileNotFoundException
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
-	 */
-	public function createResource(PathInfoInterface $pathInfo): ResourceInterface;
+    /**
+     * @throws FileNotFoundException
+     * @throws FilesystemException
+     */
+    public function createResource(PathInfoInterface $pathInfo): ResourceInterface;
 
-	/**
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\FileNotFoundException
-	 * @throws \SixtyEightPublishers\FileStorage\Exception\FilesystemException
-	 */
-	public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface;
+    /**
+     * @throws FileNotFoundException
+     * @throws FilesystemException
+     */
+    public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface;
 }

@@ -6,6 +6,6 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config;
 
 final class FileStorageConfig
 {
-	/** @var array<string, StorageConfig> */
-	public array $storages;
+    /** @var array<string, StorageConfig> */
+    public array $storages;
 }

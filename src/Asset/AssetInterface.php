@@ -6,7 +6,7 @@ namespace SixtyEightPublishers\FileStorage\Asset;
 
 interface AssetInterface
 {
-	public function getSourceRealPath(): string;
+    public function getSourceRealPath(): string;
 
-	public function getOutputPath(): string;
+    public function getOutputPath(): string;
 }

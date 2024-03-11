@@ -6,5 +6,5 @@ namespace SixtyEightPublishers\FileStorage\Cleaner;
 
 interface FileKeepResolverInterface
 {
-	public function isKept(string $filename): bool;
+    public function isKept(string $filename): bool;
 }
