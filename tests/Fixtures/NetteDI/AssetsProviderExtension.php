@@ -10,12 +10,12 @@ use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\AssetsProviderInterface;
 
 final class AssetsProviderExtension extends CompilerExtension implements AssetsProviderInterface
 {
-	public function provideAssets(): array
-	{
-		return [
-			new Assets('default', [
-				'test' => 'test',
-			]),
-		];
-	}
+    public function provideAssets(): array
+    {
+        return [
+            new Assets('default', [
+                'test' => 'test',
+            ]),
+        ];
+    }
 }

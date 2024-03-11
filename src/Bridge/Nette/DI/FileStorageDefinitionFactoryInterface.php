@@ -9,7 +9,7 @@ use SixtyEightPublishers\FileStorage\Bridge\Nette\DI\Config\StorageConfig;
 
 interface FileStorageDefinitionFactoryInterface
 {
-	public function canCreateFileStorage(string $name, StorageConfig $config): bool;
+    public function canCreateFileStorage(string $name, StorageConfig $config): bool;
 
-	public function createFileStorage(string $name, StorageConfig $config): ServiceDefinition;
+    public function createFileStorage(string $name, StorageConfig $config): ServiceDefinition;
 }

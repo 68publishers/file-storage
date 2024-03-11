@@ -11,8 +11,8 @@ use IteratorAggregate;
  */
 interface FileStorageProviderInterface extends IteratorAggregate
 {
-	/**
-	 * @param string|null $name Null is default
-	 */
-	public function get(?string $name = null): FileStorageInterface;
+    /**
+     * @param string|null $name Null is default
+     */
+    public function get(?string $name = null): FileStorageInterface;
 }
