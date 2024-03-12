@@ -15,9 +15,11 @@ use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Persistence\FilePersister;
 use SixtyEightPublishers\FileStorage\Persistence\FilePersisterInterface;
-use SixtyEightPublishers\FileStorage\Resource\SimpleResource;
+use SixtyEightPublishers\FileStorage\Resource\StreamResource;
+use SixtyEightPublishers\FileStorage\Tests\Fixtures\StringResource;
 use Tester\Assert;
 use Tester\TestCase;
+use function fclose;
 use function fopen;
 
 require __DIR__ . '/../bootstrap.php';
@@ -163,7 +165,7 @@ final class FilePersisterTest extends TestCase
         $persister = new FilePersister($filesystem);
 
         Assert::exception(
-            static fn () => $persister->save(new SimpleResource($pathInfo, '{}')),
+            static fn () => $persister->save(new StringResource($pathInfo, '{}')),
             FilesystemException::class,
             'Unable to write file at location: var/www/file.json. test',
         );
@@ -186,7 +188,7 @@ final class FilePersisterTest extends TestCase
 
         $persister = new FilePersister($filesystem);
 
-        $path = $persister->save(new SimpleResource($pathInfo, '{}'), [
+        $path = $persister->save(new StringResource($pathInfo, '{}'), [
             FilePersisterInterface::OPTION_SUPPRESS_EXCEPTIONS => true,
         ]);
 
@@ -205,7 +207,7 @@ final class FilePersisterTest extends TestCase
         $filesystem = $this->createFilesystem();
         $persister = new FilePersister($filesystem);
 
-        $path = $persister->save(new SimpleResource($pathInfo, '{}'));
+        $path = $persister->save(new StringResource($pathInfo, '{}'));
 
         Assert::same($filename, $path);
         Assert::true($filesystem->fileExists($filename));
@@ -227,14 +229,20 @@ final class FilePersisterTest extends TestCase
         $filesystem = $this->createFilesystem();
         $persister = new FilePersister($filesystem);
 
-        $path = $persister->save(new SimpleResource($pathInfo, fopen(__DIR__ . '/file.json', 'rb')));
+        $source = fopen(__DIR__ . '/file.json', 'rb');
 
-        Assert::same($filename, $path);
-        Assert::true($filesystem->fileExists($filename));
+        try {
+            $path = $persister->save(new StreamResource($pathInfo, $source, null, null));
 
-        $contents = $filesystem->read($filename);
+            Assert::same($filename, $path);
+            Assert::true($filesystem->fileExists($filename));
 
-        Assert::same("{\"abc\":123}\n", $contents);
+            $contents = $filesystem->read($filename);
+
+            Assert::same("{\"abc\":123}\n", $contents);
+        } finally {
+            fclose($source);
+        }
     }
 
     private function createFilesystem(array $files = []): Filesystem

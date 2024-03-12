@@ -83,8 +83,8 @@ use SixtyEightPublishers\FileStorage\FileStorageInterface;
 
 /** @var FileStorageInterface $storage */
 
-# Create a resource from a local file:
-$resource = $storage->createResourceFromLocalFile(
+# Create a resource from file or url:
+$resource = $storage->createResourceFromFile(
     $storage->createPathInfo('test/invoice.pdf'),
     __DIR__ . '/path/to/invoice.pdf'
 );
@@ -274,7 +274,7 @@ use SixtyEightPublishers\FileStorage\FileStorageInterface;
 /** @var FileStorageInterface $storage */
 
 $pathInfo = $storage->createPathInfo('test/avatar.png');
-$resource = $storage->createResourceFromLocalFile($pathInfo, __DIR__ . '/path/to/uploaded/file.png');
+$resource = $storage->createResourceFromFile($pathInfo, __DIR__ . '/path/to/uploaded/file.png');
 
 $storage->save($resource);
 

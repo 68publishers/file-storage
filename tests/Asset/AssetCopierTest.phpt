@@ -14,7 +14,7 @@ use SixtyEightPublishers\FileStorage\Asset\AssetsCopier;
 use SixtyEightPublishers\FileStorage\Asset\PathsProviderInterface;
 use SixtyEightPublishers\FileStorage\FileStorageInterface;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
-use SixtyEightPublishers\FileStorage\Resource\SimpleResource;
+use SixtyEightPublishers\FileStorage\Resource\ResourceInterface;
 use Tester\Assert;
 use Tester\TestCase;
 
@@ -59,14 +59,14 @@ final class AssetCopierTest extends TestCase
 
         foreach ([['config.json', 'config.json'], ['static/extra/a.json', 'a.json'], ['static/extra/b.json', 'b.json']] as [$from, $to]) {
             $pathInfo = Mockery::mock(PathInfoInterface::class);
-            $resource = new SimpleResource($pathInfo, '{}');
+            $resource = Mockery::mock(ResourceInterface::class);
 
             $fileStorage->shouldReceive('createPathInfo')
                 ->once()
                 ->with($to)
                 ->andReturn($pathInfo);
 
-            $fileStorage->shouldReceive('createResourceFromLocalFile')
+            $fileStorage->shouldReceive('createResourceFromFile')
                 ->once()
                 ->with($pathInfo, $from)
                 ->andReturn($resource);

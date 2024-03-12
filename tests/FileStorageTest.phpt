@@ -147,12 +147,12 @@ final class FileStorageTest extends TestCase
         $storage = $this->createFileStorage(resourceFactory: $resourceFactory);
         $pathInfo = $storage->createPathInfo('var/www/file.json');
 
-        $resourceFactory->shouldReceive('createResourceFromLocalFile')
+        $resourceFactory->shouldReceive('createResourceFromFile')
             ->once()
             ->with($pathInfo, 'var/www/file.json')
             ->andReturns($resource);
 
-        Assert::same($resource, $storage->createResourceFromLocalFile($pathInfo, 'var/www/file.json'));
+        Assert::same($resource, $storage->createResourceFromFile($pathInfo, 'var/www/file.json'));
     }
 
     protected function tearDown(): void

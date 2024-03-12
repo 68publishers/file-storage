@@ -76,8 +76,8 @@ class FileStorage implements FileStorageInterface
         return $this->resourceFactory->createResource($pathInfo);
     }
 
-    public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
+    public function createResourceFromFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
     {
-        return $this->resourceFactory->createResourceFromLocalFile($pathInfo, $filename);
+        return $this->resourceFactory->createResourceFromFile($pathInfo, $filename);
     }
 }

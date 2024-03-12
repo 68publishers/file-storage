@@ -92,7 +92,7 @@ final class ResourceFactoryTest extends TestCase
         $resourceFactory = $this->createResourceFactory();
 
         Assert::exception(
-            static fn () => $resourceFactory->createResourceFromLocalFile($pathInfo, __DIR__ . '/missing.json'),
+            static fn () => $resourceFactory->createResourceFromFile($pathInfo, __DIR__ . '/missing.json'),
             FileNotFoundException::class,
             'File "%A?%missing.json" not found.',
         );
@@ -108,7 +108,7 @@ final class ResourceFactoryTest extends TestCase
 
         try {
             Assert::exception(
-                static fn () => $resourceFactory->createResourceFromLocalFile($pathInfo, __DIR__ . '/file.nonReadable.json'),
+                static fn () => $resourceFactory->createResourceFromFile($pathInfo, __DIR__ . '/file.nonReadable.json'),
                 FilesystemException::class,
                 'Can not read stream from file "%A?%/file.nonReadable.json". %A?%',
             );
@@ -121,7 +121,7 @@ final class ResourceFactoryTest extends TestCase
     {
         $pathInfo = Mockery::mock(PathInfoInterface::class);
         $resourceFactory = $this->createResourceFactory();
-        $resource = $resourceFactory->createResourceFromLocalFile($pathInfo, __DIR__ . '/file.json');
+        $resource = $resourceFactory->createResourceFromFile($pathInfo, __DIR__ . '/file.json');
 
         Assert::same($pathInfo, $resource->getPathInfo());
         Assert::true(is_resource($resource->getSource()));

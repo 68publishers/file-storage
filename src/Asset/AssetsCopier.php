@@ -48,7 +48,7 @@ final class AssetsCopier implements AssetsCopierInterface
      */
     private function copyAsset(AssetInterface $asset, FileStorageInterface $fileStorage): void
     {
-        $resource = $fileStorage->createResourceFromLocalFile(
+        $resource = $fileStorage->createResourceFromFile(
             $fileStorage->createPathInfo($asset->getOutputPath()),
             $asset->getSourceRealPath(),
         );

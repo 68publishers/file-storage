@@ -10,10 +10,11 @@ interface ResourceInterface
 {
     public function getPathInfo(): PathInfoInterface;
 
-    /**
-     * @return string|resource
-     */
     public function getSource(): mixed;
 
-    public function withPathInfo(PathInfoInterface $pathInfo): static;
+    public function withPathInfo(PathInfoInterface $pathInfo): self;
+
+    public function getMimeType(): ?string;
+
+    public function getFilesize(): ?int;
 }

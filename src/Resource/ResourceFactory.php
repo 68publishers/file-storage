@@ -6,13 +6,23 @@ namespace SixtyEightPublishers\FileStorage\Resource;
 
 use League\Flysystem\FilesystemException as LeagueFilesystemException;
 use League\Flysystem\FilesystemReader;
+use League\Flysystem\UnableToRetrieveMetadata;
 use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
 use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use function error_clear_last;
 use function error_get_last;
 use function file_exists;
+use function filter_var;
+use function fopen;
+use function is_file;
 use function sprintf;
+use function str_starts_with;
+use function stream_context_create;
+use function stream_get_meta_data;
+use function strlen;
+use function strtolower;
+use function trim;
 
 final class ResourceFactory implements ResourceFactoryInterface
 {
@@ -36,33 +46,167 @@ final class ResourceFactory implements ResourceFactoryInterface
         try {
             $source = $this->filesystemReader->readStream($path);
         } catch (LeagueFilesystemException $e) {
-            throw new FilesystemException(sprintf(
-                'Can not read stream from file "%s".',
-                $path,
-            ), 0, $e);
+            throw new FilesystemException(
+                message: sprintf(
+                    'Can not read stream from file "%s".',
+                    $path,
+                ),
+                previous: $e,
+            );
         }
 
-        return new SimpleResource($pathInfo, $source);
+        return new StreamResource(
+            pathInfo: $pathInfo,
+            source: $source,
+            mimeType: function () use ($path): ?string {
+                try {
+                    return $this->filesystemReader->mimeType($path);
+                } catch (LeagueFilesystemException|UnableToRetrieveMetadata $e) {
+                    return null;
+                }
+            },
+            filesize: function () use ($path): ?int {
+                try {
+                    return $this->filesystemReader->fileSize($path);
+                } catch (LeagueFilesystemException|UnableToRetrieveMetadata $e) {
+                    return null;
+                }
+            },
+        );
     }
 
-    public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
+    public function createResourceFromFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
+    {
+        return match (true) {
+            (bool) filter_var($filename, FILTER_VALIDATE_URL) => $this->getResourceFromUrl(
+                pathInfo: $pathInfo,
+                url: $filename,
+            ),
+            file_exists($filename) && is_file($filename) => $this->getResourceFromLocalFile(
+                pathInfo: $pathInfo,
+                filename: $filename,
+            ),
+            default => throw new FileNotFoundException($filename),
+        };
+    }
+
+    /**
+     * @throws FilesystemException
+     */
+    private function getResourceFromUrl(PathInfoInterface $pathInfo, string $url): ResourceInterface
     {
         error_clear_last();
 
-        if (!file_exists($filename)) {
-            throw new FileNotFoundException($filename);
+        $context = stream_context_create(
+            options: [
+                'http' => [
+                    'method' => 'GET',
+                    'protocol_version' => 1.1,
+                    'header' => "Accept-language: en\r\n" . "User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36\r\n",
+                ],
+            ],
+        );
+
+        $source = @fopen(
+            filename: $url,
+            mode: 'rb',
+            context: $context,
+        );
+
+        if (false === $source) {
+            throw new FilesystemException(
+                message: sprintf(
+                    'Can not read stream from url "%s". %s',
+                    $url,
+                    error_get_last()['message'] ?? '',
+                ),
+            );
         }
 
-        $resource = @fopen($filename, 'rb');
+        $headers = stream_get_meta_data($source)['wrapper_data'] ?? [];
 
-        if (false === $resource) {
-            throw new FilesystemException(sprintf(
-                'Can not read stream from file "%s". %s',
-                $filename,
-                error_get_last()['message'] ?? '',
-            ), 0);
+        return new StreamResource(
+            pathInfo: $pathInfo,
+            source: $source,
+            mimeType: function () use ($headers): ?string {
+                return $this->getHeaderValue(
+                    headers: $headers,
+                    name: 'Content-Type',
+                );
+            },
+            filesize: function () use ($headers): ?int {
+                $filesize = $this->getHeaderValue(
+                    headers: $headers,
+                    name: 'Content-Length',
+                );
+
+                return null !== $filesize ? (int) $filesize : null;
+            },
+        );
+    }
+
+    /**
+     * @throws FilesystemException
+     */
+    private function getResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
+    {
+        error_clear_last();
+
+        $source = @fopen(
+            filename: $filename,
+            mode: 'rb',
+        );
+
+        if (false === $source) {
+            throw new FilesystemException(
+                message: sprintf(
+                    'Can not read stream from file "%s". %s',
+                    $filename,
+                    error_get_last()['message'] ?? '',
+                ),
+            );
         }
 
-        return new SimpleResource($pathInfo, $resource);
+        return new StreamResource(
+            pathInfo: $pathInfo,
+            source: $source,
+            mimeType: function (StreamResource $resource): ?string {
+                $mimeType = @mime_content_type($resource->getSource());
+
+                return false === $mimeType ? null : $mimeType;
+            },
+            filesize: function () use ($filename): ?int {
+                $filesize = @filesize(
+                    filename: $filename,
+                );
+
+                return false === $filesize ? null : $filesize;
+            },
+        );
+    }
+
+    /**
+     * @param array<int, string> $headers
+     */
+    private function getHeaderValue(array $headers, string $name): ?string
+    {
+        $name = strtolower($name);
+
+        foreach ($headers as $header) {
+            $header = trim(strtolower($header));
+
+            if (!str_starts_with($header, $name . ':')) {
+                continue;
+            }
+
+            $value = substr(
+                string: $header,
+                offset: strlen($name) + 1,
+            );
+
+            return trim($value);
+        }
+
+        return null;
     }
 }
