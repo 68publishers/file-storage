@@ -20,5 +20,5 @@ interface ResourceFactoryInterface
      * @throws FileNotFoundException
      * @throws FilesystemException
      */
-    public function createResourceFromLocalFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface;
+    public function createResourceFromFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface;
 }
