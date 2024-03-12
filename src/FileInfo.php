@@ -94,12 +94,17 @@ class FileInfo implements FileInfoInterface
         return $this->link();
     }
 
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'path' => $this->pathInfo->getPath(),
             'storage' => $this->getStorageName(),
             'version' => $this->pathInfo->getVersion(),
         ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }

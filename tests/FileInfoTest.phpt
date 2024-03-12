@@ -180,6 +180,31 @@ final class FileInfoTest extends TestCase
         Assert::same('https://www.example.com/files/file.json', $fileInfo->link());
     }
 
+    public function testFileInfoShouldBeConvertedToArray(): void
+    {
+        $linkGenerator = Mockery::mock(LinkGeneratorInterface::class);
+        $pathInfo = Mockery::mock(PathInfoInterface::class);
+
+        $pathInfo->shouldReceive('getPath')
+            ->once()
+            ->andReturn('var/www/file.json');
+
+        $pathInfo->shouldReceive('getVersion')
+            ->once()
+            ->andReturn('123');
+
+        $fileInfo = new FileInfo($linkGenerator, $pathInfo, 'default');
+
+        Assert::same(
+            [
+                'path' => 'var/www/file.json',
+                'storage' => 'default',
+                'version' => '123',
+            ],
+            $fileInfo->toArray(),
+        );
+    }
+
     public function testFileInfoShouldBeSerializedIntoJson(): void
     {
         $linkGenerator = Mockery::mock(LinkGeneratorInterface::class);

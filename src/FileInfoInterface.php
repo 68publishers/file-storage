@@ -15,5 +15,10 @@ interface FileInfoInterface extends PathInfoInterface, JsonSerializable
     /**
      * @return array{path: string, storage: string, version: ?string}
      */
+    public function toArray(): array;
+
+    /**
+     * @return array{path: string, storage: string, version: ?string}
+     */
     public function jsonSerialize(): array;
 }
