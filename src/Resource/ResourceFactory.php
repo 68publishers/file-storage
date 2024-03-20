@@ -10,8 +10,10 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
 use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
+use function array_shift;
 use function error_clear_last;
 use function error_get_last;
+use function explode;
 use function file_exists;
 use function filter_var;
 use function fopen;
@@ -129,10 +131,21 @@ final class ResourceFactory implements ResourceFactoryInterface
             pathInfo: $pathInfo,
             source: $source,
             mimeType: function () use ($headers): ?string {
-                return $this->getHeaderValue(
+                $contentTypeHeader = $this->getHeaderValue(
                     headers: $headers,
                     name: 'Content-Type',
                 );
+
+                if (null === $contentTypeHeader) {
+                    return null;
+                }
+
+                $parts = explode(
+                    separator: ';',
+                    string: $contentTypeHeader,
+                );
+
+                return array_shift($parts);
             },
             filesize: function () use ($headers): ?int {
                 $filesize = $this->getHeaderValue(
