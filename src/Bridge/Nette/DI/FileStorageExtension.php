@@ -69,7 +69,7 @@ final class FileStorageExtension extends CompilerExtension implements FileStorag
                         'adapter' => Expect::anyOf(Expect::string(), Expect::type(Statement::class))->required()->before(static function ($factory) {
                             return $factory instanceof Statement ? $factory : new Statement($factory);
                         }),
-                        'config' => Expect::array([
+                        'config' => Expect::array([ # @phpstan-ignore-line false positive `Call to an undefined method Nette\Schema\Elements\Structure|Nette\Schema\Elements\Type::mergeDefaults().`
                             FlysystemConfig::OPTION_VISIBILITY => Visibility::PUBLIC,
                             FlysystemConfig::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
                         ])->mergeDefaults(),

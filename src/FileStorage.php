@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage;
 
 use League\Flysystem\FilesystemOperator;
+use Psr\Http\Message\StreamInterface;
 use SixtyEightPublishers\FileStorage\Config\ConfigInterface;
 use SixtyEightPublishers\FileStorage\Exception\PathInfoException;
 use SixtyEightPublishers\FileStorage\Helper\Path;
@@ -79,5 +80,10 @@ class FileStorage implements FileStorageInterface
     public function createResourceFromFile(PathInfoInterface $pathInfo, string $filename): ResourceInterface
     {
         return $this->resourceFactory->createResourceFromFile($pathInfo, $filename);
+    }
+
+    public function createResourceFromPsrStream(PathInfoInterface $pathInfo, StreamInterface $stream): ResourceInterface
+    {
+        return $this->resourceFactory->createResourceFromPsrStream($pathInfo, $stream);
     }
 }
