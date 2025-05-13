@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\FileStorage\Tests\Resource;
 
+use GuzzleHttp\Psr7\BufferStream;
+use GuzzleHttp\Psr7\Stream;
 use League\Flysystem\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
@@ -14,6 +16,8 @@ use SixtyEightPublishers\FileStorage\PathInfoInterface;
 use SixtyEightPublishers\FileStorage\Resource\ResourceFactory;
 use Tester\Assert;
 use Tester\TestCase;
+use function fclose;
+use function fopen;
 use function is_resource;
 use function stream_get_contents;
 
@@ -81,9 +85,15 @@ final class ResourceFactoryTest extends TestCase
 
         $resource = $resourceFactory->createResource($pathInfo);
 
-        Assert::same($pathInfo, $resource->getPathInfo());
-        Assert::true(is_resource($resource->getSource()));
-        Assert::same('{}', stream_get_contents($resource->getSource()));
+        try {
+            Assert::same($pathInfo, $resource->getPathInfo());
+            Assert::true(is_resource($resource->getSource()));
+            Assert::same('{}', stream_get_contents($resource->getSource()));
+            Assert::same('application/json', $resource->getMimeType());
+            Assert::same(2, $resource->getFilesize());
+        } finally {
+            fclose($resource->getSource());
+        }
     }
 
     public function testExceptionShouldBeThrownIfLocalFileIsMissing(): void
@@ -123,9 +133,57 @@ final class ResourceFactoryTest extends TestCase
         $resourceFactory = $this->createResourceFactory();
         $resource = $resourceFactory->createResourceFromFile($pathInfo, __DIR__ . '/file.json');
 
-        Assert::same($pathInfo, $resource->getPathInfo());
-        Assert::true(is_resource($resource->getSource()));
-        Assert::same("{\"abc\":123}\n", stream_get_contents($resource->getSource()));
+        try {
+            Assert::same($pathInfo, $resource->getPathInfo());
+            Assert::true(is_resource($resource->getSource()));
+            Assert::same("{\"abc\":123}\n", stream_get_contents($resource->getSource()));
+            Assert::same('application/json', $resource->getMimeType());
+            Assert::same(12, $resource->getFilesize());
+        } finally {
+            fclose($resource->getSource());
+        }
+    }
+
+    public function testResourceFromFileBasedPsrStreamShouldBeCreated(): void
+    {
+        $pathInfo = Mockery::mock(PathInfoInterface::class);
+        $resourceFactory = $this->createResourceFactory();
+
+        $handle = fopen(__DIR__ . '/file.json', 'r+');
+        $stream = new Stream($handle);
+
+        try {
+            $resource = $resourceFactory->createResourceFromPsrStream($pathInfo, $stream);
+
+            Assert::same($pathInfo, $resource->getPathInfo());
+            Assert::true(is_resource($resource->getSource()));
+            Assert::same("{\"abc\":123}\n", stream_get_contents($resource->getSource()));
+            Assert::same('application/json', $resource->getMimeType());
+            Assert::same(12, $resource->getFilesize());
+            Assert::same($handle, $resource->getSource());
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    public function testResourceFromBufferPsrStreamShouldBeCreated(): void
+    {
+        $pathInfo = Mockery::mock(PathInfoInterface::class);
+        $resourceFactory = $this->createResourceFactory();
+
+        $stream = new BufferStream();
+        $stream->write("{\"abc\":123}\n");
+        $resource = $resourceFactory->createResourceFromPsrStream($pathInfo, $stream);
+
+        try {
+            Assert::same($pathInfo, $resource->getPathInfo());
+            Assert::true(is_resource($resource->getSource()));
+            Assert::same("{\"abc\":123}\n", stream_get_contents($resource->getSource()));
+            Assert::same('application/json', $resource->getMimeType());
+            Assert::same(12, $resource->getFilesize());
+        } finally {
+            fclose($resource->getSource());
+        }
     }
 
     private function createResourceFactory(array $files = [], ?InMemoryFilesystemAdapter $adapter = null): ResourceFactory

@@ -6,6 +6,7 @@ namespace SixtyEightPublishers\FileStorage\Tests;
 
 use League\Flysystem\FilesystemOperator;
 use Mockery;
+use Psr\Http\Message\StreamInterface;
 use SixtyEightPublishers\FileStorage\Config\ConfigInterface;
 use SixtyEightPublishers\FileStorage\FileStorage;
 use SixtyEightPublishers\FileStorage\LinkGenerator\LinkGeneratorInterface;
@@ -153,6 +154,23 @@ final class FileStorageTest extends TestCase
             ->andReturns($resource);
 
         Assert::same($resource, $storage->createResourceFromFile($pathInfo, 'var/www/file.json'));
+    }
+
+    public function testResourceFromPsrStreamShouldBeCreated(): void
+    {
+        $resourceFactory = Mockery::mock(ResourceFactoryInterface::class);
+        $resource = Mockery::mock(ResourceInterface::class);
+        $stream = Mockery::mock(StreamInterface::class);
+
+        $storage = $this->createFileStorage(resourceFactory: $resourceFactory);
+        $pathInfo = $storage->createPathInfo('var/www/file.json');
+
+        $resourceFactory->shouldReceive('createResourceFromPsrStream')
+            ->once()
+            ->with($pathInfo, $stream)
+            ->andReturns($resource);
+
+        Assert::same($resource, $storage->createResourceFromPsrStream($pathInfo, $stream));
     }
 
     protected function tearDown(): void

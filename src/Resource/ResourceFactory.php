@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\FileStorage\Resource;
 
+use finfo;
 use League\Flysystem\FilesystemException as LeagueFilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
 use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
+use function array_key_exists;
 use function array_shift;
 use function error_clear_last;
 use function error_get_last;
@@ -17,7 +21,14 @@ use function explode;
 use function file_exists;
 use function filter_var;
 use function fopen;
+use function fread;
+use function fstat;
+use function ftell;
+use function fwrite;
+use function get_debug_type;
 use function is_file;
+use function is_resource;
+use function rewind;
 use function sprintf;
 use function str_starts_with;
 use function stream_context_create;
@@ -25,6 +36,7 @@ use function stream_get_meta_data;
 use function strlen;
 use function strtolower;
 use function trim;
+use const FILEINFO_MIME_TYPE;
 
 final class ResourceFactory implements ResourceFactoryInterface
 {
@@ -90,6 +102,77 @@ final class ResourceFactory implements ResourceFactoryInterface
             ),
             default => throw new FileNotFoundException($filename),
         };
+    }
+
+    public function createResourceFromPsrStream(PathInfoInterface $pathInfo, StreamInterface $stream): ResourceInterface
+    {
+        $size = $stream->getSize();
+        $streamCopy = clone $stream;
+        $source = $streamCopy->detach();
+
+        # For non resource based streams:
+        if (!is_resource($source)) {
+            $source = @fopen('php://temp', 'rb+');
+
+            if (false === $source) {
+                throw new FilesystemException(
+                    message: sprintf(
+                        'Unable to create temporary stream for PSR-7 stream of type %s.',
+                        get_debug_type($stream),
+                    ),
+                );
+            }
+
+            try {
+                $stream->rewind();
+            } catch (RuntimeException $e) {
+                # ignore
+            }
+
+            # clone data to the resource
+            while (!$stream->eof()) {
+                $chunk = $stream->read(8192);
+                if ('' === $chunk) {
+                    break;
+                }
+
+                fwrite($source, $chunk);
+            }
+            rewind($source);
+        }
+
+        return new StreamResource(
+            pathInfo: $pathInfo,
+            source: $source,
+            mimeType: function (StreamResource $resource): ?string {
+                $source = $resource->getSource();
+
+                if (ftell($source) !== 0 && stream_get_meta_data($source)['seekable']) {
+                    rewind($source);
+                }
+
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mimeType = null;
+                $chunk = fread($source, 1024) ?: '';
+
+                rewind($source);
+
+                if ('' !== $chunk) {
+                    $mimeType = $finfo->buffer($chunk) ?: null;
+                }
+
+                if (null === $mimeType) {
+                    $mimeType = @mime_content_type($resource->getSource()) ?: null;
+                }
+
+                return $mimeType;
+            },
+            filesize: $size ?? function (StreamResource $resource): ?int {
+                $stat = fstat($resource->getSource());
+
+                return false !== $stat && array_key_exists('size', $stat) ? (int) $stat['size'] : null;
+            },
+        );
     }
 
     /**

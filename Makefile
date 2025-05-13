@@ -29,7 +29,7 @@ cs.check:
 
 stan:
 	PHP=81 make composer.update
-	docker exec 68publishers.file-storage.81 vendor/bin/phpstan analyse
+	docker exec 68publishers.file-storage.81 vendor/bin/phpstan analyse --memory-limit=-1
 
 coverage:
 	PHP=81 make composer.update
