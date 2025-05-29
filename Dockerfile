@@ -12,7 +12,7 @@ RUN apk add --no-cache ${PHPIZE_DEPS} \
 
 CMD tail -f /dev/null
 
-FROM php:8.2.0RC6-cli-alpine3.16 AS php82
+FROM php:8.2.28-cli-alpine3.21 AS php82
 
 CMD ["/bin/sh"]
 WORKDIR /var/www/html
@@ -52,6 +52,6 @@ RUN apk add --no-cache ${PHPIZE_DEPS} \
     && curl -fsSL https://github.com/zonuexe/uopz/archive/refs/heads/support/php84-exit.tar.gz | tar xvz -C /usr/src/php/ext/uopz --strip 1 \
     && docker-php-ext-install uopz \
     && pecl install pcov \
-    && docker-php-ext-enable pcov
+    && docker-php-ext-enable pcov uopz
 
 CMD tail -f /dev/null

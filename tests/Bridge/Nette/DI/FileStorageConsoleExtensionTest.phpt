@@ -13,7 +13,6 @@ use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
 use SixtyEightPublishers\FileStorage\Tests\Fixtures\CustomCleanCommandConfigurator;
 use Symfony\Component\Console\Application;
 use Tester\Assert;
-use Tester\CodeCoverage\Collector;
 use Tester\TestCase;
 use function assert;
 use function call_user_func;
@@ -55,14 +54,6 @@ final class FileStorageConsoleExtensionTest extends TestCase
             CustomCleanCommandConfigurator::class,
         ]);
         $this->assertCopyAssetsCommand($application);
-    }
-
-    protected function tearDown(): void
-    {
-        # save manually partial code coverage to free memory
-        if (Collector::isStarted()) {
-            Collector::save();
-        }
     }
 
     private function assertCleanCommand(Application $application, array $configuratorTypes): void

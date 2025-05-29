@@ -25,7 +25,6 @@ use SixtyEightPublishers\FileStorage\FileStorageProvider;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use SixtyEightPublishers\FileStorage\Tests\Fixtures\CustomFileStorage;
 use Tester\Assert;
-use Tester\CodeCoverage\Collector;
 use Tester\TestCase;
 use function assert;
 use function call_user_func;
@@ -89,14 +88,6 @@ final class FileStorageExtensionTest extends TestCase
         Assert::same(FileStorage::class, get_class($provider->get('default')));
         Assert::same(FileStorage::class, get_class($provider->get('other')));
         Assert::same(CustomFileStorage::class, get_class($provider->get('custom')));
-    }
-
-    protected function tearDown(): void
-    {
-        # save manually partial code coverage to free memory
-        if (Collector::isStarted()) {
-            Collector::save();
-        }
     }
 
     private function assertFileStorages(Container $container): void
