@@ -9,7 +9,6 @@ use Doctrine\DBAL\Types\Type;
 use SixtyEightPublishers\FileStorage\Bridge\Doctrine\DbalType\FileInfoType;
 use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
 use Tester\Assert;
-use Tester\CodeCoverage\Collector;
 use Tester\TestCase;
 
 require __DIR__ . '/../../../bootstrap.php';
@@ -59,14 +58,6 @@ final class FileStorageDoctrineExtensionTest extends TestCase
         $type = Type::getType('custom_file_info');
 
         Assert::type(FileInfoType::class, $type);
-    }
-
-    protected function tearDown(): void
-    {
-        # save manually partial code coverage to free memory
-        if (Collector::isStarted()) {
-            Collector::save();
-        }
     }
 }
 

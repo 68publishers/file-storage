@@ -10,7 +10,6 @@ use Nette\DI\Container;
 use SixtyEightPublishers\FileStorage\Exception\RuntimeException;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use Tester\Assert;
-use Tester\CodeCoverage\Collector;
 use Tester\TestCase;
 use function assert;
 
@@ -102,14 +101,6 @@ final class FileStorageLatteExtensionTest extends TestCase
         ], [
             'fileInfo' => $fs->createFileInfo($fs->createPathInfo('static/file.png')),
         ]);
-    }
-
-    protected function tearDown(): void
-    {
-        # save manually partial code coverage to free memory
-        if (Collector::isStarted()) {
-            Collector::save();
-        }
     }
 
     private function assertLatte(Container $container, array $assertions, array $params = []): void
