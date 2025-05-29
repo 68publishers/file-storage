@@ -30,7 +30,7 @@ jobs:
         run: composer update --no-progress --prefer-dist --prefer-stable --optimize-autoloader --quiet
 
       - name: Php-Cs-Fixer
-        run: vendor/bin/php-cs-fixer fix -v --dry-run
+        run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix -v --dry-run
 
   php-stan:
     name: PHPStan

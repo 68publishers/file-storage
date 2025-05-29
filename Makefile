@@ -17,6 +17,13 @@ restart:
 	make stop
 	make start
 
+exec-sh:
+ifndef PHP
+	docker exec -it $(CONTAINER_NAME).84 sh
+else
+	docker exec -it $(CONTAINER_NAME).$(PHP) sh
+endif
+
 tests.all:
 	PHP=81 make tests.run
 	PHP=82 make tests.run
@@ -25,11 +32,11 @@ tests.all:
 
 cs.fix:
 	PHP=84 make composer.update
-	docker exec $(CONTAINER_NAME).84 vendor/bin/php-cs-fixer fix -v
+	docker exec -e PHP_CS_FIXER_IGNORE_ENV=1 $(CONTAINER_NAME).84 vendor/bin/php-cs-fixer fix -v
 
 cs.check:
 	PHP=84 make composer.update
-	docker exec $(CONTAINER_NAME).84 vendor/bin/php-cs-fixer fix -v --dry-run
+	docker exec -e PHP_CS_FIXER_IGNORE_ENV=1 $(CONTAINER_NAME).84 vendor/bin/php-cs-fixer fix -v --dry-run
 
 stan:
 	PHP=84 make composer.update
