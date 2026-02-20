@@ -157,7 +157,7 @@ final class FileInfoTest extends TestCase
 
         $linkGenerator->shouldReceive('link')
             ->once()
-            ->with($pathInfo)
+            ->with($pathInfo, true)
             ->andReturn('https://www.example.com/files/file.json');
 
         $fileInfo = new FileInfo($linkGenerator, $pathInfo, 'default');
@@ -172,12 +172,27 @@ final class FileInfoTest extends TestCase
 
         $linkGenerator->shouldReceive('link')
             ->once()
-            ->with($pathInfo)
+            ->with($pathInfo, true)
             ->andReturn('https://www.example.com/files/file.json');
 
         $fileInfo = new FileInfo($linkGenerator, $pathInfo, 'default');
 
         Assert::same('https://www.example.com/files/file.json', $fileInfo->link());
+    }
+
+    public function testRelativeLinkShouldBeReturned(): void
+    {
+        $linkGenerator = Mockery::mock(LinkGeneratorInterface::class);
+        $pathInfo = Mockery::mock(PathInfoInterface::class);
+
+        $linkGenerator->shouldReceive('link')
+            ->once()
+            ->with($pathInfo, false)
+            ->andReturn('/files/file.json');
+
+        $fileInfo = new FileInfo($linkGenerator, $pathInfo, 'default');
+
+        Assert::same('/files/file.json', $fileInfo->link(false));
     }
 
     public function testFileInfoShouldBeConvertedToArray(): void

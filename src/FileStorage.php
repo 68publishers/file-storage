@@ -67,9 +67,12 @@ class FileStorage implements FileStorageInterface
         return new FileInfo($this->linkGenerator, $pathInfo, $this->getName());
     }
 
-    public function link(PathInfoInterface $pathInfo): string
+    public function link(PathInfoInterface $pathInfo, bool $absolute = true): string
     {
-        return $this->linkGenerator->link($pathInfo);
+        return $this->linkGenerator->link(
+            pathInfo: $pathInfo,
+            absolute: $absolute,
+        );
     }
 
     public function createResource(PathInfoInterface $pathInfo): ResourceInterface

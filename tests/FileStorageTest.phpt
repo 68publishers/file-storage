@@ -120,10 +120,24 @@ final class FileStorageTest extends TestCase
 
         $linkGenerator->shouldReceive('link')
             ->once()
-            ->with($pathInfo)
+            ->with($pathInfo, true)
             ->andReturns('https://www.example.com/var/www/file.json');
 
         Assert::same('https://www.example.com/var/www/file.json', $storage->link($pathInfo));
+    }
+
+    public function testRelativeLinkShouldBeReturned(): void
+    {
+        $linkGenerator = Mockery::mock(LinkGeneratorInterface::class);
+        $storage = $this->createFileStorage(linkGenerator: $linkGenerator);
+        $pathInfo = $storage->createPathInfo('var/www/file.json');
+
+        $linkGenerator->shouldReceive('link')
+            ->once()
+            ->with($pathInfo, false)
+            ->andReturns('/var/www/file.json');
+
+        Assert::same('/var/www/file.json', $storage->link($pathInfo, false));
     }
 
     public function testResourceShouldBeCreated(): void

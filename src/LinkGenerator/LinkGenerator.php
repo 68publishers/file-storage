@@ -16,7 +16,7 @@ class LinkGenerator implements LinkGeneratorInterface
         private readonly ConfigInterface $config,
     ) {}
 
-    public function link(PathInfoInterface $pathInfo): string
+    public function link(PathInfoInterface $pathInfo, bool $absolute = true): string
     {
         $basePath = $this->config[ConfigInterface::BASE_PATH];
         $path = $pathInfo->getPath();
@@ -31,7 +31,7 @@ class LinkGenerator implements LinkGeneratorInterface
             $link .= '?' . implode('&', $queryParameters);
         }
 
-        if (!empty($this->config[ConfigInterface::HOST])) {
+        if ($absolute && !empty($this->config[ConfigInterface::HOST])) {
             $link = $this->config[ConfigInterface::HOST] . $link;
         }
 
