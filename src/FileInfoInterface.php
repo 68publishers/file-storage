@@ -10,7 +10,7 @@ interface FileInfoInterface extends PathInfoInterface, JsonSerializable
 {
     public function getStorageName(): string;
 
-    public function link(): string;
+    public function link(bool $absolute = true): string;
 
     /**
      * @return array{path: string, storage: string, version: ?string}

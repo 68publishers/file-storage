@@ -19,9 +19,12 @@ class FileInfo implements FileInfoInterface
         return $this->imageStorageName;
     }
 
-    public function link(): string
+    public function link(bool $absolute = true): string
     {
-        return $this->linkGenerator->link($this->pathInfo);
+        return $this->linkGenerator->link(
+            pathInfo: $this->pathInfo,
+            absolute: $absolute,
+        );
     }
 
     public function withNamespace(string $namespace): static

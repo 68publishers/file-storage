@@ -67,6 +67,34 @@ final class LinkGeneratorTest extends TestCase
         Assert::same('https://www.example.com/files/var/www/file.json?_v=123', $generator->link($this->createPathInfo('var/www/file.json', '123')));
     }
 
+    public function testRelativeLinkShouldBeCreatedWhenAbsoluteIsFalse(): void
+    {
+        $generator = new LinkGenerator(new Config([
+            ConfigInterface::HOST => 'https://www.example.com',
+        ]));
+
+        Assert::same('/var/www/file.json', $generator->link($this->createPathInfo('var/www/file.json', null), false));
+    }
+
+    public function testRelativeVersionedLinkShouldBeCreatedWhenAbsoluteIsFalse(): void
+    {
+        $generator = new LinkGenerator(new Config([
+            ConfigInterface::HOST => 'https://www.example.com',
+            ConfigInterface::BASE_PATH => '/files/',
+        ]));
+
+        Assert::same('/files/var/www/file.json?_v=123', $generator->link($this->createPathInfo('var/www/file.json', '123'), false));
+    }
+
+    public function testRelativeLinkShouldBeCreatedWithoutHostEvenWhenNotConfigured(): void
+    {
+        $generator = new LinkGenerator(new Config([
+            ConfigInterface::BASE_PATH => '/files/',
+        ]));
+
+        Assert::same('/files/var/www/file.json', $generator->link($this->createPathInfo('var/www/file.json', null), false));
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();
