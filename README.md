@@ -18,6 +18,16 @@ The best way to install 68publishers/file-storage is using Composer:
 $ composer require 68publishers/file-storage
 ```
 
+Requirements: PHP `^8.3` and `league/flysystem` `^3.12`. The optional integrations support `nette/di` `^3.0.10`, `latte/latte` `^3.0`, `symfony/console` `^5.4 || ^6.4 || ^7.0 || ^8.0` and `doctrine/dbal` `^2.13.1 || ^3.1.1 || ^4.0` (via [68publishers/doctrine-bridge](https://github.com/68publishers/doctrine-bridge)).
+
+## Upgrade
+
+### From 1.x to 2.0
+
+- The minimal PHP version is 8.3.
+- `symfony/console` older than 5.4 is no longer supported.
+- There are no other BC breaks in the API.
+
 ## Integration into Nette Framework
 
 With this extension, you can register more storages with different roots, filesystem adapters etc.

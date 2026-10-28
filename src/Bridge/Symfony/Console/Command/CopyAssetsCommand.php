@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FileStorage\Bridge\Symfony\Console\Command;
 
 use SixtyEightPublishers\FileStorage\Asset\AssetsCopierInterface;
-use SixtyEightPublishers\FileStorage\FileStorageInterface;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use function assert;
 use function is_string;
 use function iterator_to_array;
 
@@ -38,8 +36,6 @@ final class CopyAssetsCommand extends Command
         $logger = new ConsoleLogger($output);
 
         foreach (is_string($storageName) ? [$this->fileStorageProvider->get($storageName)] : iterator_to_array($this->fileStorageProvider) as $storage) {
-            assert($storage instanceof FileStorageInterface);
-
             $this->assetsCopier->copy($storage, $logger);
         }
 

@@ -13,7 +13,6 @@ use RuntimeException;
 use SixtyEightPublishers\FileStorage\Exception\FileNotFoundException;
 use SixtyEightPublishers\FileStorage\Exception\FilesystemException;
 use SixtyEightPublishers\FileStorage\PathInfoInterface;
-use function array_key_exists;
 use function array_shift;
 use function error_clear_last;
 use function error_get_last;
@@ -27,6 +26,7 @@ use function ftell;
 use function fwrite;
 use function get_debug_type;
 use function implode;
+use function is_array;
 use function is_file;
 use function is_resource;
 use function parse_url;
@@ -172,7 +172,7 @@ final class ResourceFactory implements ResourceFactoryInterface
             filesize: $size ?? function (StreamResource $resource): ?int {
                 $stat = fstat($resource->getSource());
 
-                return false !== $stat && array_key_exists('size', $stat) ? (int) $stat['size'] : null;
+                return false !== $stat ? $stat['size'] : null;
             },
         );
     }
@@ -232,7 +232,9 @@ final class ResourceFactory implements ResourceFactoryInterface
             );
         }
 
+        # HTTP headers for the http(s) wrapper, user-space wrappers (e.g. s3://) return the wrapper instance
         $headers = stream_get_meta_data($source)['wrapper_data'] ?? [];
+        $headers = is_array($headers) ? $headers : [];
 
         return new StreamResource(
             pathInfo: $pathInfo,
@@ -306,27 +308,32 @@ final class ResourceFactory implements ResourceFactoryInterface
     }
 
     /**
+     * Returns the value from the last response, the headers contain all responses when redirects are followed.
+     *
      * @param array<int, string> $headers
      */
     private function getHeaderValue(array $headers, string $name): ?string
     {
         $name = strtolower($name);
+        $value = null;
 
         foreach ($headers as $header) {
             $header = trim(strtolower($header));
 
-            if (!str_starts_with($header, $name . ':')) {
+            if (str_starts_with($header, 'http/')) {
+                $value = null;
+
                 continue;
             }
 
-            $value = substr(
-                string: $header,
-                offset: strlen($name) + 1,
-            );
-
-            return trim($value);
+            if (str_starts_with($header, $name . ':')) {
+                $value = trim(substr(
+                    string: $header,
+                    offset: strlen($name) + 1,
+                ));
+            }
         }
 
-        return null;
+        return $value;
     }
 }

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Tester\Assert;
 use Tester\TestCase;
 use function assert;
+use function method_exists;
 
 require __DIR__ . '/../../../../bootstrap.php';
 
@@ -80,7 +81,8 @@ final class CopyAssetsCommandTest extends TestCase
         $command = new CopyAssetsCommand($assetsCopier, $fileStorageProvider);
         $application = new Application();
 
-        $application->add($command);
+        # Application::add() was removed in symfony/console 8.0, addCommand() exists since 7.4
+        method_exists($application, 'addCommand') ? $application->addCommand($command) : $application->add($command);
 
         $command = $application->find('file-storage:copy-assets');
         assert($command instanceof CopyAssetsCommand);

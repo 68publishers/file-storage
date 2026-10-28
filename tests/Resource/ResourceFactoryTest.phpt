@@ -18,8 +18,16 @@ use Tester\Assert;
 use Tester\TestCase;
 use function fclose;
 use function fopen;
+use function fsockopen;
 use function is_resource;
+use function proc_open;
+use function proc_terminate;
+use function random_int;
 use function stream_get_contents;
+use function stream_wrapper_register;
+use function stream_wrapper_unregister;
+use function usleep;
+use const PHP_BINARY;
 
 require __DIR__ . '/../bootstrap.php';
 
@@ -186,6 +194,46 @@ final class ResourceFactoryTest extends TestCase
         }
     }
 
+    public function testResourceFromUrlShouldUseHeadersOfLastResponseAfterRedirect(): void
+    {
+        $port = random_int(20000, 60000);
+        $server = proc_open([PHP_BINARY, '-S', '127.0.0.1:' . $port, __DIR__ . '/http-router.php'], [], $pipes);
+
+        try {
+            for ($i = 0; $i < 50 && false === ($socket = @fsockopen('127.0.0.1', $port)); $i++) {
+                usleep(100_000);
+            }
+
+            Assert::notSame(false, $socket);
+            fclose($socket);
+
+            $pathInfo = Mockery::mock(PathInfoInterface::class);
+            $resource = $this->createResourceFactory()->createResourceFromFile($pathInfo, 'http://127.0.0.1:' . $port . '/redirect');
+
+            Assert::same("{\"abc\":123}\n", stream_get_contents($resource->getSource()));
+            Assert::same('application/json', $resource->getMimeType());
+            Assert::same(12, $resource->getFilesize());
+        } finally {
+            proc_terminate($server);
+        }
+    }
+
+    public function testResourceFromUrlWithUserStreamWrapperShouldBeCreated(): void
+    {
+        stream_wrapper_register('fsqtest', StringStreamWrapper::class);
+
+        try {
+            $pathInfo = Mockery::mock(PathInfoInterface::class);
+            $resource = $this->createResourceFactory()->createResourceFromFile($pathInfo, 'fsqtest://bucket/file.json');
+
+            Assert::same('content', stream_get_contents($resource->getSource()));
+            Assert::null($resource->getMimeType());
+            Assert::null($resource->getFilesize());
+        } finally {
+            stream_wrapper_unregister('fsqtest');
+        }
+    }
+
     private function createResourceFactory(array $files = [], ?InMemoryFilesystemAdapter $adapter = null): ResourceFactory
     {
         $fs = new Filesystem(
@@ -202,6 +250,43 @@ final class ResourceFactoryTest extends TestCase
     protected function tearDown(): void
     {
         Mockery::close();
+    }
+}
+
+final class StringStreamWrapper
+{
+    /** @var resource|null */
+    public $context;
+
+    private bool $read = false;
+
+    public function stream_open(string $path, string $mode, int $options, ?string &$openedPath): bool
+    {
+        return true;
+    }
+
+    public function stream_read(int $count): string
+    {
+        if ($this->read) {
+            return '';
+        }
+
+        $this->read = true;
+
+        return 'content';
+    }
+
+    public function stream_eof(): bool
+    {
+        return $this->read;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function stream_stat(): array
+    {
+        return [];
     }
 }
 
