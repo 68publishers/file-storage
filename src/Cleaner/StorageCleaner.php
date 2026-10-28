@@ -9,7 +9,6 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\StorageAttributes;
 use function array_pop;
-use function assert;
 use function count;
 use function explode;
 
@@ -30,7 +29,7 @@ final class StorageCleaner implements StorageCleanerInterface
                     return false;
                 }
 
-                $parts = explode(DIRECTORY_SEPARATOR, $attributes->path());
+                $parts = explode('/', $attributes->path());
 
                 return !$this->fileKeepResolver->isKept(array_pop($parts));
             })
@@ -51,14 +50,12 @@ final class StorageCleaner implements StorageCleanerInterface
                     return true;
                 }
 
-                $parts = explode(DIRECTORY_SEPARATOR, $attributes->path());
+                $parts = explode('/', $attributes->path());
 
                 return !$this->fileKeepResolver->isKept(array_pop($parts));
             });
 
         foreach ($contents as $attributes) {
-            assert($attributes instanceof StorageAttributes);
-
             if ($attributes->isDir()) {
                 $filesystemOperator->deleteDirectory($attributes->path());
 

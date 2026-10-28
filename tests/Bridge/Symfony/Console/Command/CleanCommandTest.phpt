@@ -18,6 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Tester\Assert;
 use Tester\TestCase;
 use function assert;
+use function method_exists;
 
 require __DIR__ . '/../../../../bootstrap.php';
 
@@ -279,7 +280,8 @@ final class CleanCommandTest extends TestCase
         $command = new CleanCommand($fileStorageProvider, $storageCleaner, $configuration);
         $application = new Application();
 
-        $application->add($command);
+        # Application::add() was removed in symfony/console 8.0, addCommand() exists since 7.4
+        method_exists($application, 'addCommand') ? $application->addCommand($command) : $application->add($command);
 
         $command = $application->find('file-storage:clean');
         assert($command instanceof CleanCommand);
