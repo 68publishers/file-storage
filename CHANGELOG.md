@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-29
+
+### Fixed
+
+- The console commands `file-storage:clean` and `file-storage:copy-assets` are named by the attribute `#[AsCommand]` instead of `configure()`. Lazy command loaders (e.g. `contributte/console` 0.10+, `symfony/console` 7 without the static `$defaultName`) need the name before the command is created.
+
 ## [2.0.0] - 2026-10-28
 
 ### Changed
@@ -134,7 +140,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/68publishers/file-storage/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/68publishers/file-storage/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/68publishers/file-storage/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/68publishers/file-storage/compare/v1.4.1...v2.0.0
 [1.4.1]: https://github.com/68publishers/file-storage/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/68publishers/file-storage/compare/v1.3.0...v1.4.0

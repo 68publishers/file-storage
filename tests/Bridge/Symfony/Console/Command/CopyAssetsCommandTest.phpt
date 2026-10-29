@@ -22,6 +22,15 @@ require __DIR__ . '/../../../../bootstrap.php';
 
 final class CopyAssetsCommandTest extends TestCase
 {
+    public function testCommandIsNamedByAttribute(): void
+    {
+        # lazy command loaders (e.g. contributte/console 0.10+) read the name from #[AsCommand] before the command is created
+        $command = new CopyAssetsCommand(Mockery::mock(AssetsCopierInterface::class), Mockery::mock(FileStorageProviderInterface::class));
+
+        Assert::same('file-storage:copy-assets', $command->getName());
+        Assert::same('Copies assets from a defined paths to a configured storage.', $command->getDescription());
+    }
+
     public function testAssetsFromAllStoragesShouldBeCopied(): void
     {
         $provider = Mockery::mock(FileStorageProviderInterface::class);
