@@ -8,6 +8,7 @@ use SixtyEightPublishers\FileStorage\Bridge\Symfony\Console\Configurator\CleanCo
 use SixtyEightPublishers\FileStorage\Cleaner\StorageCleanerInterface;
 use SixtyEightPublishers\FileStorage\FileStorageInterface;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use function implode;
 use function is_string;
 use function iterator_to_array;
 
+#[AsCommand(name: 'file-storage:clean', description: 'Cleans file storage')]
 class CleanCommand extends Command
 {
     public function __construct(
@@ -34,9 +36,7 @@ class CleanCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('file-storage:clean')
-            ->setDescription('Cleans file storage')
-            ->addArgument('storage', InputArgument::OPTIONAL, 'Clean only specific storage.', null);
+        $this->addArgument('storage', InputArgument::OPTIONAL, 'Clean only specific storage.', null);
 
         $this->cleanCommandConfigurator->setupOptions($this);
     }

@@ -6,6 +6,7 @@ namespace SixtyEightPublishers\FileStorage\Bridge\Symfony\Console\Command;
 
 use SixtyEightPublishers\FileStorage\Asset\AssetsCopierInterface;
 use SixtyEightPublishers\FileStorage\FileStorageProviderInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function is_string;
 use function iterator_to_array;
 
+#[AsCommand(name: 'file-storage:copy-assets', description: 'Copies assets from a defined paths to a configured storage.')]
 final class CopyAssetsCommand extends Command
 {
     public function __construct(
@@ -25,9 +27,7 @@ final class CopyAssetsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('file-storage:copy-assets')
-            ->setDescription('Copies assets from a defined paths to a configured storage.')
-            ->addArgument('storage', InputArgument::OPTIONAL, 'Copy assets for specific storage only.');
+        $this->addArgument('storage', InputArgument::OPTIONAL, 'Copy assets for specific storage only.');
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
